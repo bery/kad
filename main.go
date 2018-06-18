@@ -10,10 +10,12 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var listen = ":5000"
+var hits = 0
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "OK")
@@ -32,7 +34,8 @@ var rootPage = `
 
 <head>
 <title>Kubernetes app demo</title>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 <style>
 td {
 	font-size: 70%;
@@ -50,7 +53,7 @@ a {
 <div class="col-sm-6">
 
 {{ if .Hits }}
-<div class="alert alert-info">Hello World! I have been seen <strong>{{ .Hits }}</strong> times.</div>
+<div class="alert alert-info">This worker returned page <strong>{{ .Hits }}</strong> times.</div>
 {{ end }}
 
 
@@ -85,9 +88,27 @@ a {
 </html>
 `
 
+var pageHits = prometheus.NewCounter(prometheus.CounterOpts{
+	Name: "page_hits",
+	Help: "Number of page visits",
+})
+
+func init() {
+	err := prometheus.Register(pageHits)
+	if err != nil {
+		log.Printf("Unable to register pageHits: %s", err)
+	}
+}
+
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
-	pc := pageContent{Vars: make(map[string]string)}
+	hits = hits + 1
+	pageHits.Set(float64(hits))
+
+	pc := pageContent{
+		Vars: make(map[string]string),
+		Hits: hits,
+	}
 
 	// read environment variables
 	for _, v := range os.Environ() {

@@ -65,13 +65,15 @@ build:
 container:
   <<: *job
   stage: publish
-  image: tomkukral/buildah
+  image: docker:latest
+  services:
+    - docker:dind
   dependencies:
     - build
   script:
-    - podman version
-    - buildah version
-    - podman login --username "${REGISTRY_USERNAME}" --password "${REGISTRY_PASSWORD}" "${REGISTRY_SERVER}"
-    - buildah bud -t "${REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" .
-    - buildah push "${REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" docker://${REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}"
-    - podman logout "${REGISTRY_SERVER}"
+    - docker info
+    - docker login -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}" "${REGISTRY_SERVER}"
+    - echo "$CI_BUILD_REF" > VERSION
+    - docker build -t "${REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" .
+    - docker push "${REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}"
+    - docker logout "${REGISTRY_SERVER}"

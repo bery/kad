@@ -60,7 +60,7 @@ build:
       - build_out/
     expire_in: 4 week
   script:
-    - go build
+    - CGO_ENABLED=0 go build -o build_out/kad
 
 container:
   <<: *job

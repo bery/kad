@@ -1,0 +1,77 @@
+# required variables
+# REGISTRY_USERNAME
+# REGISTRY_PASSWORD
+
+variables:
+  GO_PROJECT: gitlab.com/tomkukral/kad
+  REGISTRY_IMAGE: docker.io/tomkukral/kad
+  REGISTRY_SERVER: docker.io
+  GOPATH: /go
+  DEPCACHEDIR: ${CI_PROJECT_DIR}/.cache/dep/
+  IMAGE_GO_BUILDER: golang:1.10
+
+stages:
+  - prepare
+  - test
+  - publish
+
+.job: &job
+  tags: [docker]
+  cache:
+    policy: pull
+    paths:
+      - vendor/
+  before_script:
+    - mkdir -p "${DEPCACHEDIR}"
+
+    - mkdir -p "${GOPATH}/src/${GO_PROJECT}"
+    - rmdir -v "${GOPATH}/src/${GO_PROJECT}"
+
+    - ln -sv "${PWD}" "${GOPATH}/src/${GO_PROJECT}"
+    - cd "${GOPATH}/src/${GO_PROJECT}"
+
+lint:
+  <<: *job
+  stage: prepare
+  image: ${IMAGE_GO_BUILDER}
+  cache:
+    policy: pull-push
+    paths:
+      - vendor/
+  script:
+    - go get -u github.com/golang/dep/cmd/dep
+    - dep ensure -v -vendor-only
+    - dep status
+
+unittest:
+  <<: *job
+  stage: test
+  image: ${IMAGE_GO_BUILDER}
+  script:
+    - go test ./...
+
+build:
+  <<: *job
+  stage: test
+  image: ${IMAGE_GO_BUILDER}
+  artifacts:
+    name: "$CI_COMMIT_SHA"
+    paths:
+      - build_out/
+    expire_in: 4 week
+  script:
+    - go build
+
+container:
+  <<: *job
+  stage: publish
+  image: tomkukral/buildah
+  dependencies:
+    - build
+  script:
+    - podman version
+    - buildah version
+    - podman login --username "${REGISTRY_USERNAME}" --password "${REGISTRY_PASSWORD}" "${REGISTRY_SERVER}"
+    - buildah bud -t "${REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" .
+    - buildah push "${REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" docker://${REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}"
+    - podman logout "${REGISTRY_SERVER}"

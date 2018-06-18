@@ -37,6 +37,9 @@ var rootPage = `
 td {
 	font-size: 70%;
 	}
+a {
+	font-weight: bold;
+}
 </style>
 </head>
 
@@ -49,6 +52,10 @@ td {
 {{ if .Hits }}
 <div class="alert alert-info">Hello World! I have been seen <strong>{{ .Hits }}</strong> times.</div>
 {{ end }}
+
+
+<div class="alert alert-info">Metrics exported at <a href="/metrics">/metrics</a></div>
+
 
 {{ if .RedisHost }}
 <div class="alert alert-info">Redis host is <code>{{ .RedisHost }}</code></div>

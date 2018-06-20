@@ -36,9 +36,9 @@ body {
 
 
 {{ if .RedisHost }}
-<div class="alert alert-info">Redis host is <code>{{ .RedisHost }}</code></div>
+<div class="alert alert-info">Redis server is <code>{{ .RedisHost }}</code></div>
 {{ else }}
-<div class="alert alert-info">Redis server not used.</div>
+<div class="alert alert-info">Redis server not used, set <code>REDIS_SERVER</code> to use it.</div>
 {{ end }}
 
 </div>

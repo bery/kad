@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/go-redis/redis"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -56,16 +57,42 @@ func init() {
 	if err != nil {
 		log.Printf("Unable to read hostname: %s", err)
 	}
+
+	// detect redis
+	pc.RedisHost = os.Getenv("REDIS_SERVER")
 }
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "OK")
 }
 
+func addHit() {
+	if pc.RedisHost == "" {
+		// Use pc variable
+		pc.Hits = pc.Hits + 1
+
+	} else {
+		// use redis
+		client := redis.NewClient(&redis.Options{
+			Addr: pc.RedisHost,
+		})
+
+		defer client.Close()
+
+		hits, err := client.Incr("hits").Result()
+		if err != nil {
+			fmt.Printf("Unable to inc hits in redis: %s", err)
+		}
+		pc.Hits = int(hits)
+
+	}
+
+	pageHits.Set(float64(pc.Hits))
+}
+
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
-	pc.Hits = pc.Hits + 1
-	pageHits.Set(float64(pc.Hits))
+	addHit()
 
 	// render template
 	t, err := template.New("tpl").Parse(rootPage)

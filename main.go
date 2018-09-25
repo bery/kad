@@ -106,6 +106,9 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	// log stars
+	log.Printf("Started with command: %s", strings.Join(os.Args, " "))
+
 	r := mux.NewRouter()
 
 	// register handlers

@@ -14,6 +14,7 @@ stages:
   - prepare
   - test
   - publish
+  - release
 
 .job: &job
   tags: [docker]
@@ -76,4 +77,22 @@ container:
     - echo "$CI_BUILD_REF" > VERSION
     - docker build -t "${REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" .
     - docker push "${REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}"
+    - docker logout "${REGISTRY_SERVER}"
+
+release:
+  <<: *job
+  stage: release
+  only: 
+    - master
+  image: docker:latest
+  services:
+    - docker:dind
+  dependencies:
+    - container
+  script:
+    - docker info
+    - docker login -u "${REGISTRY_USERNAME}" -p "${REGISTRY_PASSWORD}" "${REGISTRY_SERVER}"
+    - docker pull "${REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}"
+    - docker tag "${REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" "${REGISTRY_IMAGE}:latest"
+    - docker push "${REGISTRY_IMAGE}:latest"
     - docker logout "${REGISTRY_SERVER}"

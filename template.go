@@ -41,6 +41,16 @@ body {
 <div class="alert alert-info">Redis server not used, set <code>REDIS_SERVER</code> to use it.</div>
 {{ end }}
 
+{{ if .Cmd }}
+<div class="alert alert-info">Started with <code>{{ .Cmd }}</code></div>
+{{ end }}
+
+{{ if .ConfFile }}
+<div class="alert alert-info">Config file content:<br><code>{{ .ConfFile }}</code></div>
+{{ else }}
+<div class="alert alert-warning">Config file <code>/etc/kad.conf</code> is empty.</code></div>
+{{ end }}
+
 </div>
 
 <div class="col-sm-6">

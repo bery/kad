@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -19,6 +20,8 @@ type pageContent struct {
 	Hostname  string
 	Hits      int
 	RedisHost string
+	Cmd       string
+	ConfFile  string
 }
 
 type envVar struct {
@@ -36,9 +39,11 @@ func (e *envVar) detect() {
 }
 
 var listen = ":5000"
+var configFile = "/etc/kad/config.yml"
 var pc = pageContent{
 	Vars: make(map[string]*envVar),
 	Hits: 0,
+	Cmd:  "",
 }
 
 func init() {
@@ -58,8 +63,18 @@ func init() {
 		log.Printf("Unable to read hostname: %s", err)
 	}
 
+	// read command
+	pc.Cmd = strings.Join(os.Args, " ")
+
 	// detect redis
 	pc.RedisHost = os.Getenv("REDIS_SERVER")
+
+	// read config file
+	if content, err := ioutil.ReadFile(configFile); err != nil {
+		log.Printf("Unable to read config file %s: %s", configFile, err)
+	} else {
+		pc.ConfFile = string(content)
+	}
 }
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
@@ -106,9 +121,6 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	// log stars
-	log.Printf("Started with command: %s", strings.Join(os.Args, " "))
-
 	r := mux.NewRouter()
 
 	// register handlers

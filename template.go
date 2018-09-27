@@ -48,7 +48,7 @@ body {
 {{ if .ConfFile }}
 <div class="alert alert-info">Config file content:<br><code><pre>{{ .ConfFile }}<pre></code></div>
 {{ else }}
-<div class="alert alert-warning">Config file <code>/etc/kad.conf</code> is empty.</code></div>
+<div class="alert alert-warning">Config file <code>/etc/kad/config.yml</code> is empty.</code></div>
 {{ end }}
 
 </div>

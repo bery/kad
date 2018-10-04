@@ -77,7 +77,11 @@ func init() {
 	}
 }
 
-func healthHandler(w http.ResponseWriter, r *http.Request) {
+func readyHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "OK")
+}
+
+func liveHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "OK")
 }
 
@@ -125,7 +129,8 @@ func main() {
 
 	// register handlers
 	r.HandleFunc("/", rootHandler)
-	r.HandleFunc("/health", healthHandler)
+	r.HandleFunc("/check/live", liveHandler)
+	r.HandleFunc("/check/ready", readyHandler)
 	r.Handle("/metrics", promhttp.Handler())
 
 	// log requests

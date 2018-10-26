@@ -16,12 +16,13 @@ import (
 )
 
 type pageContent struct {
-	Vars      map[string]*envVar
-	Hostname  string
-	Hits      int
-	RedisHost string
-	Cmd       string
-	ConfFile  string
+	Vars       map[string]*envVar
+	Hostname   string
+	Hits       int
+	RedisHost  string
+	RedisError string
+	Cmd        string
+	ConfFile   string
 }
 
 type envVar struct {
@@ -69,12 +70,6 @@ func init() {
 	// detect redis
 	pc.RedisHost = os.Getenv("REDIS_SERVER")
 
-	// read config file
-	if content, err := ioutil.ReadFile(configFile); err != nil {
-		log.Printf("Unable to read config file %s: %s", configFile, err)
-	} else {
-		pc.ConfFile = string(content)
-	}
 }
 
 func readyHandler(w http.ResponseWriter, r *http.Request) {
@@ -85,7 +80,7 @@ func liveHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "OK")
 }
 
-func addHit() {
+func addHit() error {
 	if pc.RedisHost == "" {
 		// Use pc variable
 		pc.Hits = pc.Hits + 1
@@ -100,18 +95,38 @@ func addHit() {
 
 		hits, err := client.Incr("hits").Result()
 		if err != nil {
-			fmt.Printf("Unable to inc hits in redis: %s", err)
+			return fmt.Errorf("Unable to inc hits in redis: %s", err)
 		}
 		pc.Hits = int(hits)
 
 	}
 
 	pageHits.Set(float64(pc.Hits))
+
+	return nil
+}
+
+func readConfig() {
+	// read config file
+	if content, err := ioutil.ReadFile(configFile); err != nil {
+		log.Printf("Unable to read config file %s: %s", configFile, err)
+	} else {
+		pc.ConfFile = string(content)
+	}
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
-	addHit()
+	err = addHit()
+	if err != nil {
+		log.Printf("Redis error: %e", err)
+		pc.RedisError = err.Error()
+	} else {
+		pc.RedisError = ""
+	}
+
+	// update config file context
+	readConfig()
 
 	// render template
 	t, err := template.New("tpl").Parse(rootPage)

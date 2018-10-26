@@ -38,11 +38,15 @@ body {
 {{ if .RedisHost }}
 <div class="alert alert-info">Redis server is <code>{{ .RedisHost }}</code></div>
 {{ else }}
-<div class="alert alert-info">Redis server not used, set <code>REDIS_SERVER</code> to use it.</div>
+<div class="alert alert-warning">Redis server not used, set <code>REDIS_SERVER</code> to use it.</div>
+{{ end }}
+
+{{ if ne .RedisError "" }}
+<div class="alert alert-danger">Redis connection failed: <code>{{ .RedisError }}</code></div>
 {{ end }}
 
 {{ if .Cmd }}
-<div class="alert alert-info">Started with <code>{{ .Cmd }}</code></div>
+<div class="alert alert-info">Started with command <code>{{ .Cmd }}</code></div>
 {{ end }}
 
 {{ if .ConfFile }}

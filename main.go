@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/go-redis/redis"
 	"github.com/gorilla/handlers"
@@ -40,12 +41,18 @@ func (e *envVar) detect() {
 }
 
 var listen = ":5000"
+var listenAdmin = ":5001"
 var configFile = "/etc/kad/config.yml"
 var pc = pageContent{
 	Vars: make(map[string]*envVar),
 	Hits: 0,
 	Cmd:  "",
 }
+
+var checkReady = true
+
+var exit = make(chan error)
+var exitDelay = 15 * time.Second
 
 func init() {
 	var err error
@@ -73,11 +80,28 @@ func init() {
 }
 
 func readyHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "OK")
+	if checkReady {
+		fmt.Fprintf(w, "OK")
+	} else {
+		http.Error(w, "NOT ready", http.StatusNotFound)
+	}
 }
 
 func liveHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "OK")
+}
+
+func terminateHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Terminating on request from %s", r.RemoteAddr)
+	log.Printf("Reporting this instance as NOT ready")
+	checkReady = false
+	fmt.Fprintf(w, "OK")
+
+	go func() {
+		time.Sleep(exitDelay)
+
+		exit <- nil
+	}()
 }
 
 func addHit() error {
@@ -142,16 +166,40 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	r := mux.NewRouter()
 
+	adminRouter := mux.NewRouter()
+
 	// register handlers
 	r.HandleFunc("/", rootHandler)
 	r.HandleFunc("/check/live", liveHandler)
 	r.HandleFunc("/check/ready", readyHandler)
 	r.Handle("/metrics", promhttp.Handler())
 
+	adminRouter.HandleFunc("/action/terminate", terminateHandler)
+
 	// log requests
 	loggedRouter := handlers.LoggingHandler(os.Stdout, r)
+	loggedAdminRouter := handlers.LoggingHandler(os.Stdout, adminRouter)
 
-	log.Printf("Listening on %s\n", listen)
-	log.Fatal(http.ListenAndServe(listen, loggedRouter))
+	go func() {
+		log.Printf("Listening on %s\n", listen)
+		if err := http.ListenAndServe(listen, loggedRouter); err != nil {
+			log.Printf("Server failed with: %s", err)
+		}
+	}()
+
+	go func() {
+		log.Printf("Listening admin interface on %s\n", listenAdmin)
+		if err := http.ListenAndServe(listenAdmin, loggedAdminRouter); err != nil {
+			log.Printf("Admin server failed with: %s", err)
+		}
+	}()
+
+	select {
+	case err := <-exit:
+		if err != nil {
+			log.Printf("Terminating with error: %s", err)
+		}
+
+	}
 
 }

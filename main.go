@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 
@@ -139,6 +140,32 @@ func readConfig() {
 	}
 }
 
+// make heavu computation
+func heavyHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Starting heavy load")
+
+	go func() {
+		f, err := os.Open(os.DevNull)
+		if err != nil {
+			panic(err)
+		}
+		defer f.Close()
+
+		n := runtime.NumCPU()
+		runtime.GOMAXPROCS(n)
+
+		for i := 0; i < n; i++ {
+			go func() {
+				for {
+					fmt.Fprintf(f, ".")
+				}
+			}()
+		}
+	}()
+
+	time.Sleep(3 * time.Second)
+}
+
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 	err = addHit()
@@ -170,6 +197,7 @@ func main() {
 
 	// register handlers
 	r.HandleFunc("/", rootHandler)
+	r.HandleFunc("/heavy", heavyHandler)
 	r.HandleFunc("/check/live", liveHandler)
 	r.HandleFunc("/check/ready", readyHandler)
 	r.Handle("/metrics", promhttp.Handler())

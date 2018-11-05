@@ -14,6 +14,7 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
@@ -78,6 +79,28 @@ func init() {
 	// detect redis
 	pc.RedisHost = os.Getenv("REDIS_SERVER")
 
+}
+
+func responseTime(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		next.ServeHTTP(w, r)
+		took := time.Since(start).Seconds()
+
+		// set duration
+		httpDuration.With(
+			prometheus.Labels{
+				"method":   r.Method,
+				"endpoint": r.URL.String(),
+			}).Observe(took)
+
+		// increase cout
+		httpRequestTotal.With(
+			prometheus.Labels{
+				"method":   r.Method,
+				"endpoint": r.URL.String(),
+			}).Add(1)
+	})
 }
 
 func readyHandler(w http.ResponseWriter, r *http.Request) {
@@ -210,7 +233,7 @@ func main() {
 	adminRouter.HandleFunc("/action/terminate", terminateHandler)
 
 	// log requests
-	loggedRouter := handlers.LoggingHandler(os.Stdout, r)
+	loggedRouter := handlers.LoggingHandler(os.Stdout, responseTime(r))
 	loggedAdminRouter := handlers.LoggingHandler(os.Stdout, adminRouter)
 
 	go func() {

@@ -168,7 +168,7 @@ func readConfig() {
 	}
 }
 
-// make heavu computation
+// make heavy computation
 func heavyHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Starting heavy load")
 
@@ -192,6 +192,12 @@ func heavyHandler(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	time.Sleep(3 * time.Second)
+}
+
+// make slow response
+func slowHandler(w http.ResponseWriter, r *http.Request) {
+	time.Sleep(3 * time.Second)
+	fmt.Fprintf(w, "Executed slow load\n")
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
@@ -226,6 +232,7 @@ func main() {
 	// register handlers
 	r.HandleFunc("/", rootHandler)
 	r.HandleFunc("/heavy", heavyHandler)
+	r.HandleFunc("/slow", slowHandler)
 	r.HandleFunc("/check/live", liveHandler)
 	r.HandleFunc("/check/ready", readyHandler)
 	r.Handle("/metrics", promhttp.Handler())

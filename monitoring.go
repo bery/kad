@@ -13,7 +13,7 @@ var pageHits = prometheus.NewCounter(prometheus.CounterOpts{
 
 var httpRequestTotal = prometheus.NewCounterVec(
 	prometheus.CounterOpts{
-		Name: "http_request_total",
+		Name: "http_requests_total",
 		Help: "Total number of requests served by this instance",
 	},
 	[]string{"method", "endpoint"},
@@ -21,7 +21,7 @@ var httpRequestTotal = prometheus.NewCounterVec(
 
 var httpDuration = prometheus.NewHistogramVec(
 	prometheus.HistogramOpts{
-		Name: "http_request_duration",
+		Name: "http_requests_duration",
 		Help: "Time took to serve request",
 	},
 	[]string{"method", "endpoint"},

@@ -81,7 +81,12 @@ func init() {
 }
 
 func readyHandler(w http.ResponseWriter, r *http.Request) {
-	if checkReady {
+	rf := "/tmp/notready"
+	_, err := os.Stat(rf)
+
+	if err == nil {
+		http.Error(w, fmt.Sprintf("NOT ready, %s exists", rf), http.StatusNotFound)
+	} else if checkReady {
 		fmt.Fprintf(w, "OK")
 	} else {
 		http.Error(w, "NOT ready", http.StatusNotFound)

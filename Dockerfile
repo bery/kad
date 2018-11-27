@@ -1,6 +1,6 @@
 FROM debian
 
-LABEL maintainer="Tomáš Kukrál"
+LABEL maintainer="tomkukral"
 
 RUN apt-get update && \
   apt-get install -y curl procps && \

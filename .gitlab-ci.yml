@@ -6,9 +6,8 @@ variables:
   GO_PROJECT: gitlab.com/tomkukral/kad
   REGISTRY_IMAGE: docker.io/tomkukral/kad
   REGISTRY_SERVER: docker.io
-  GOPATH: /go
-  DEPCACHEDIR: ${CI_PROJECT_DIR}/.cache/dep/
-  IMAGE_GO_BUILDER: golang:1.10
+  GOPATH: ${CI_PROJECT_DIR}/_gopath/
+  IMAGE_GO_BUILDER: golang:1.11
 
 stages:
   - prepare
@@ -21,15 +20,7 @@ stages:
   cache:
     policy: pull
     paths:
-      - vendor/
-  before_script:
-    - mkdir -p "${DEPCACHEDIR}"
-
-    - mkdir -p "${GOPATH}/src/${GO_PROJECT}"
-    - rmdir -v "${GOPATH}/src/${GO_PROJECT}"
-
-    - ln -sv "${PWD}" "${GOPATH}/src/${GO_PROJECT}"
-    - cd "${GOPATH}/src/${GO_PROJECT}"
+      - _gopath/pkg/mod/cache
 
 lint:
   <<: *job
@@ -38,11 +29,10 @@ lint:
   cache:
     policy: pull-push
     paths:
-      - vendor/
+      - _gopath/pkg/mod/cache
   script:
-    - go get -u github.com/golang/dep/cmd/dep
-    - dep ensure -v -vendor-only
-    - dep status
+    - go mod download -json
+    - go mod verify
 
 unittest:
   <<: *job
@@ -82,7 +72,7 @@ container:
 release:
   <<: *job
   stage: release
-  only: 
+  only:
     - master
   image: docker:latest
   services:

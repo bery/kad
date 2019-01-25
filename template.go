@@ -65,18 +65,18 @@ div.doc {
 <div class="doc">
 <b>Endpoints (port 5000):</b>
 <ul>
-	<li><a href="{{ .Request.URL.Path }}heavy">/heavy</a> - run many parallel goroutines printing /dev/null</li>
-	<li><a href="{{ .Request.URL.Path }}slow">/slow</a> - wait 3 second before server reply</li>
-	<li><a href="{{ .Request.URL.Path }}check/live">/check/live</a> - liveness probe, always OK</li>
-	<li><a href="{{ .Request.URL.Path }}check/ready">/check/ready</a> - readiness probo, ready if file <code>/tmp/notready</code> doesn't exist</li>
-	<li><a href="{{ .Request.URL.Path }}metrics">/metrics</a> - <a href="https://prometheus.io/">Prometheus</a> metrics</li>
+	<li><a>/heavy</a> - run many parallel goroutines printing /dev/null</li>
+	<li><a>/slow</a> - wait 3 second before server reply</li>
+	<li><a>/check/live</a> - liveness probe, always OK</li>
+	<li><a>/check/ready</a> - readiness probo, ready if file <code>/tmp/notready</code> doesn't exist</li>
+	<li><a>/metrics</a> - <a href="https://prometheus.io/">Prometheus</a> metrics</li>
 </ul>
 
 <b>Admin endpoints (port 5001):</b>
 <ul>
-	<li><a href="{{ .Request.URL.Path }}action/terminate">/action/terminate</a> - Disable readiness probe, wait 15s and exit</li>
-	<li><a href="{{ .Request.URL.Path }}check/live">/check/live</a> - liveness probe, always OK</li>
-	<li><a href="{{ .Request.URL.Path }}check/ready">/check/ready</a> - readiness probo, ready if file <code>/tmp/notready</code> doesn't exist</li>
+	<li><a>/action/terminate</a> - Disable readiness probe, wait 15s and exit</li>
+	<li><a>/check/live</a> - liveness probe, always OK</li>
+	<li><a>/check/ready</a> - readiness probo, ready if file <code>/tmp/notready</code> doesn't exist</li>
 </ul>
 
 <p>

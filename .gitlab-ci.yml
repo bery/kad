@@ -8,6 +8,7 @@ variables:
   REGISTRY_SERVER: docker.io
   GOPATH: ${CI_PROJECT_DIR}/_gopath/
   IMAGE_GO_BUILDER: golang:1.11
+  IMAGE_GO_BUILDER_LATEST: golang:latest
 
 stages:
   - prepare
@@ -38,6 +39,13 @@ unittest:
   <<: *job
   stage: test
   image: ${IMAGE_GO_BUILDER}
+  script:
+    - go test ./...
+
+unittest-latest:
+  <<: *job
+  stage: test
+  image: ${IMAGE_GO_BUILDER_LATEST}
   script:
     - go test ./...
 

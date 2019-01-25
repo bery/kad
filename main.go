@@ -19,13 +19,17 @@ import (
 )
 
 type pageContent struct {
-	Vars       map[string]*envVar
-	Hostname   string
-	Hits       int
-	RedisHost  string
-	RedisError string
-	Cmd        string
-	ConfFile   string
+	Vars           map[string]*envVar
+	Hostname       string
+	Hits           int
+	RedisHost      string
+	RedisError     string
+	Cmd            string
+	ConfFile       string
+	ConfigFilePath string
+	Help           string
+
+	Request *http.Request
 }
 
 type envVar struct {
@@ -46,9 +50,10 @@ var listen = ":5000"
 var listenAdmin = ":5001"
 var configFile = "/etc/kad/config.yml"
 var pc = pageContent{
-	Vars: make(map[string]*envVar),
-	Hits: 0,
-	Cmd:  "",
+	Vars:           make(map[string]*envVar),
+	Hits:           0,
+	Cmd:            "",
+	ConfigFilePath: configFile,
 }
 
 var checkReady = true
@@ -210,6 +215,9 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 		pc.RedisError = ""
 	}
 
+	// store request
+	pc.Request = r
+
 	// update config file context
 	readConfig()
 
@@ -238,6 +246,8 @@ func main() {
 	r.Handle("/metrics", promhttp.Handler())
 
 	adminRouter.HandleFunc("/action/terminate", terminateHandler)
+	adminRouter.HandleFunc("/check/live", liveHandler)
+	adminRouter.HandleFunc("/check/ready", readyHandler)
 
 	// log requests
 	loggedRouter := handlers.LoggingHandler(os.Stdout, responseTime(r))

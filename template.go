@@ -62,6 +62,10 @@ div.doc {
 <div class="alert alert-warning">Config file <code>/etc/kad/config.yml</code> is empty.</code></div>
 {{ end }}
 
+{{ if not .Ready }}
+<div class="alert alert-danger">This replica isn't ready.</div>
+{{ end }}
+
 <div class="doc">
 <b>Endpoints (port 5000):</b>
 <ul>

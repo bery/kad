@@ -16,7 +16,8 @@ a {
 	font-weight: bold;
 }
 body {
-	padding: 10px
+	padding: 10px;
+	background-color: {{ .Color }};
 }
 div.doc {
 	font-size: 90%;
@@ -83,16 +84,15 @@ div.doc {
 	<li><a>/check/ready</a> - readiness probo, ready if file <code>/tmp/notready</code> doesn't exist</li>
 </ul>
 
+<b>Command options:</b>
+<ul>
+	<li><a>--color</a> - Set background color</li>
+</ul>
+
+
 <p>
 Server is expecting configuration file <code>{{ .ConfigFilePath }}</code>. It will run without configuration but error mesage will be printed.
 </p>
-
-
-
-
-
-
-
 
 </div>
 

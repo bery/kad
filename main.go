@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -27,6 +28,7 @@ type pageContent struct {
 	ConfigFilePath string
 	Help           string
 	Ready          bool
+	Color          string
 
 	Request *http.Request
 }
@@ -65,6 +67,10 @@ var (
 
 func init() {
 	var err error
+
+	colorFlag := flag.String("color", "", "background color")
+	flag.Parse()
+
 	// read environment variables
 	for _, v := range os.Environ() {
 		pair := strings.Split(v, "=")
@@ -82,6 +88,17 @@ func init() {
 
 	// read command
 	pc.Cmd = strings.Join(os.Args, " ")
+
+	// setup color
+	if *colorFlag != "" {
+		pc.Color = *colorFlag
+	}
+	if v := os.Getenv("COLOR"); v != "" && pc.Color == "" {
+		pc.Color = v
+	}
+	if pc.Color == "" {
+		pc.Color = "#ffffff"
+	}
 
 	// detect redis
 	pc.RedisHost = os.Getenv("REDIS_SERVER")

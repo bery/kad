@@ -69,6 +69,7 @@ func init() {
 	var err error
 
 	colorFlag := flag.String("color", "", "background color")
+	flag.String("user", "", "fake parameter")
 	flag.Parse()
 
 	// read environment variables

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"os"
 
@@ -116,7 +117,7 @@ func kubernetesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	case "rs":
 		if err := cs.AppsV1().ReplicaSets(namespace).Delete(name, &metav1.DeleteOptions{}); err != nil {
-			http.Error(w, "Failed deleting service", http.StatusBadRequest)
+			http.Error(w, "Failed deleting replicaset", http.StatusBadRequest)
 			return
 		}
 
@@ -130,6 +131,8 @@ func kubernetesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unknown resource", http.StatusBadRequest)
 		return
 	}
+
+	log.Printf("Deleted %s/%s", rt, name)
 
 	http.Redirect(w, r, "http://"+r.Host, http.StatusPermanentRedirect)
 }

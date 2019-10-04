@@ -15,6 +15,9 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	apps_v1 "k8s.io/api/apps/v1"
+	v1 "k8s.io/api/core/v1"
+	extensions_v1beta1 "k8s.io/api/extensions/v1beta1"
 )
 
 type pageContent struct {
@@ -29,6 +32,7 @@ type pageContent struct {
 	Help           string
 	Ready          bool
 	Color          string
+	Resources      Resources
 
 	Request *http.Request
 }
@@ -37,6 +41,13 @@ type envVar struct {
 	Name      string
 	Value     string
 	Dangerous bool
+}
+
+type Resources struct {
+	Pods        []*v1.Pod
+	Services    []*v1.Service
+	Deployments []*apps_v1.Deployment
+	ReplicaSets []*extensions_v1beta1.ReplicaSet
 }
 
 func (e *envVar) detect() {

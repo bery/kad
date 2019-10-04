@@ -17,7 +17,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	apps_v1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
-	extensions_v1beta1 "k8s.io/api/extensions/v1beta1"
 )
 
 type pageContent struct {
@@ -34,7 +33,8 @@ type pageContent struct {
 	Color          string
 	Resources      Resources
 
-	Request *http.Request
+	Request        *http.Request
+	KubernetesHost string
 }
 
 type envVar struct {
@@ -47,7 +47,7 @@ type Resources struct {
 	Pods        []v1.Pod
 	Services    []v1.Service
 	Deployments []apps_v1.Deployment
-	ReplicaSets []extensions_v1beta1.ReplicaSet
+	ReplicaSets []apps_v1.ReplicaSet
 }
 
 func (e *envVar) detect() {
@@ -191,6 +191,7 @@ func main() {
 	r.HandleFunc("/slow", slowHandler)
 	r.HandleFunc("/check/live", liveHandler)
 	r.HandleFunc("/check/ready", readyHandler)
+	r.HandleFunc("/kubernetes/delete/{type}/{name}", kubernetesDeleteHandler)
 	r.Handle("/metrics", promhttp.Handler())
 
 	adminRouter.HandleFunc("/action/terminate", terminateHandler)

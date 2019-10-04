@@ -106,6 +106,8 @@ Contribution is apprecited at <a href="https://gitlab.com/6shore.net/kad">gitlab
 <div class="col-sm-6">
 <div class="doc">
 
+Kubernetes at <a href="{{ .KubernetesHost }}">{{ .KubernetesHost }}</a>
+
 Pods
 <ul>
 {{ range $i := .Resources.Pods }}

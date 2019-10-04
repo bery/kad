@@ -27,6 +27,7 @@ div.doc {
 	font-weight: 400;
 }
 </style>
+<meta http-equiv="refresh" content="2">
 </head>
 
 <body>
@@ -94,13 +95,48 @@ div.doc {
 Server is expecting configuration file <code>{{ .ConfigFilePath }}</code>. It will run without configuration but error mesage will be printed.
 </p>
 
+<p>
+Contribution is apprecited at <a href="https://gitlab.com/6shore.net/kad">gitlab.com/6shore.net/kad</a>
+</p>
+
 </div>
 
 
-
 </div>
-
 <div class="col-sm-6">
+<div class="doc">
+
+Pods
+<ul>
+{{ range $i := .Resources.Pods }}
+<li><a href="/kubernetes/delete/pod/{{ $i.ObjectMeta.Name }}">{{ $i.ObjectMeta.Name }}</a></li>
+{{ end }}
+</ul> 
+
+Deployments
+<ul>
+{{ range $i := .Resources.Deployments }}
+<li><a href="/kubernetes/delete/deploy/{{ $i.ObjectMeta.Name }}">{{ $i.ObjectMeta.Name }}</a></li>
+{{ end }}
+</ul> 
+
+ReplicaSets
+<ul>
+{{ range $i := .Resources.ReplicaSets }}
+<li><a href="/kubernetes/delete/rs/{{ $i.ObjectMeta.Name }}">{{ $i.ObjectMeta.Name }}</a></li>
+{{ end }}
+</ul> 
+
+Services
+<ul>
+{{ range $i := .Resources.Services }}
+<li><a href="/kubernetes/delete/svc/{{ $i.ObjectMeta.Name }}">{{ $i.ObjectMeta.Name }}</a></li>
+{{ end }}
+</ul> 
+
+
+</div>
+
 <table class="table table-hover">
 <thead>
 <tr><th>Variable name</th><th>Value</th></tr>

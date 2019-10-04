@@ -44,10 +44,10 @@ type envVar struct {
 }
 
 type Resources struct {
-	Pods        []*v1.Pod
-	Services    []*v1.Service
-	Deployments []*apps_v1.Deployment
-	ReplicaSets []*extensions_v1beta1.ReplicaSet
+	Pods        []v1.Pod
+	Services    []v1.Service
+	Deployments []apps_v1.Deployment
+	ReplicaSets []extensions_v1beta1.ReplicaSet
 }
 
 func (e *envVar) detect() {

@@ -29,6 +29,9 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	// update config file context
 	readConfig()
 
+	// read resources from kubernetes
+	readResources()
+
 	// render template
 	t, err := template.New("tpl").Parse(rootPage)
 	if err != nil {

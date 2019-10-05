@@ -153,7 +153,10 @@ func addHit() error {
 	} else {
 		// use redis
 		client := redis.NewClient(&redis.Options{
-			Addr: pc.RedisHost,
+			Addr:         pc.RedisHost,
+			DialTimeout:  300 * time.Millisecond,
+			ReadTimeout:  300 * time.Millisecond,
+			WriteTimeout: 300 * time.Millisecond,
 		})
 
 		defer client.Close()

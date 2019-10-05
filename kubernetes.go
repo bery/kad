@@ -85,6 +85,8 @@ func readResources() error {
 func kubernetesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
+	log.Printf("Kubernetes delete with %+v", vars)
+
 	rt, ok := vars["type"]
 	if !ok || rt == "" {
 		http.Error(w, "Missing resource type", http.StatusBadRequest)
@@ -103,27 +105,34 @@ func kubernetesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	dp := metav1.DeletePropagationBackground
+	one := int64(1)
+	do := &metav1.DeleteOptions{
+		GracePeriodSeconds: &one,
+		PropagationPolicy:  &dp,
+	}
+
 	switch rt {
 	case "pod":
-		if err := cs.CoreV1().Pods(namespace).Delete(name, &metav1.DeleteOptions{}); err != nil {
-			http.Error(w, "Failed deleting pod", http.StatusBadRequest)
+		if err := cs.CoreV1().Pods(namespace).Delete(name, do); err != nil {
+			http.Error(w, "Failed deleting pod "+err.Error(), http.StatusBadRequest)
 			return
 		}
 	case "deploy":
-		if err := cs.AppsV1().Deployments(namespace).Delete(name, &metav1.DeleteOptions{}); err != nil {
-			http.Error(w, "Failed deleting deployment", http.StatusBadRequest)
+		if err := cs.AppsV1().Deployments(namespace).Delete(name, do); err != nil {
+			http.Error(w, "Failed deleting deployment "+err.Error(), http.StatusBadRequest)
 			return
 		}
 
 	case "rs":
-		if err := cs.AppsV1().ReplicaSets(namespace).Delete(name, &metav1.DeleteOptions{}); err != nil {
-			http.Error(w, "Failed deleting replicaset", http.StatusBadRequest)
+		if err := cs.AppsV1().ReplicaSets(namespace).Delete(name, do); err != nil {
+			http.Error(w, "Failed deleting replicaset "+err.Error(), http.StatusBadRequest)
 			return
 		}
 
-	case "service":
-		if err := cs.CoreV1().Pods(namespace).Delete(name, &metav1.DeleteOptions{}); err != nil {
-			http.Error(w, "Failed deleting pod", http.StatusBadRequest)
+	case "svc":
+		if err := cs.CoreV1().Services(namespace).Delete(name, do); err != nil {
+			http.Error(w, "Failed deleting service "+err.Error(), http.StatusBadRequest)
 			return
 		}
 
@@ -134,5 +143,5 @@ func kubernetesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Deleted %s/%s", rt, name)
 
-	http.Redirect(w, r, "http://"+r.Host, http.StatusPermanentRedirect)
+	http.Redirect(w, r, "http://"+r.Host, http.StatusSeeOther)
 }

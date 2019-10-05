@@ -38,6 +38,7 @@ li.pod a, li.deploy a, li.rs a, li.svc a {
 li a, li a:hover {
 	color: white;
 	cursor: crosshair;
+	text-decoration: none;
 }
 
 li.pod {
@@ -132,7 +133,9 @@ Contribution is apprecited at <a href="https://gitlab.com/6shore.net/kad">gitlab
 <div class="col-sm-6">
 <div class="doc">
 
+<p>
 Kubernetes at <a href="{{ .KubernetesHost }}">{{ .KubernetesHost }}</a>
+</p>
 
 Pods
 <ul>

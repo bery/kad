@@ -26,7 +26,35 @@ div.doc {
 	border-radius: 2px;
 	font-weight: 400;
 }
+
+li.pod a, li.deploy a, li.rs a, li.svc a {
+	display: block;
+	padding: 2px;
+	margin: 2px;
+	color: white;
+	text-align: center;
+}
+
+li a, li a:hover {
+	color: white;
+	cursor: crosshair;
+	text-decoration: none;
+}
+
+li.pod {
+	background-color: #050505;
+}
+li.deploy {
+	background-color: #ffc674;
+}
+li.rs {
+	background-color: #f0a9d5
+}
+li.svc {
+	background-color: #dcea64;
+}
 </style>
+<meta http-equiv="refresh" content="2">
 </head>
 
 <body>
@@ -94,13 +122,52 @@ div.doc {
 Server is expecting configuration file <code>{{ .ConfigFilePath }}</code>. It will run without configuration but error mesage will be printed.
 </p>
 
+<p>
+Contribution is apprecited at <a href="https://gitlab.com/6shore.net/kad">gitlab.com/6shore.net/kad</a>
+</p>
+
 </div>
 
 
-
 </div>
-
 <div class="col-sm-6">
+<div class="doc">
+
+<p>
+Kubernetes at <a href="{{ .KubernetesHost }}">{{ .KubernetesHost }}</a>
+</p>
+
+Pods
+<ul>
+{{ range $i := .Resources.Pods }}
+<li class="pod"><a href="/kubernetes/delete/pod/{{ $i.ObjectMeta.Name }}">{{ $i.ObjectMeta.Name }}</a></li>
+{{ end }}
+</ul> 
+
+Deployments
+<ul>
+{{ range $i := .Resources.Deployments }}
+<li class="deploy"><a href="/kubernetes/delete/deploy/{{ $i.ObjectMeta.Name }}">{{ $i.ObjectMeta.Name }}</a></li>
+{{ end }}
+</ul> 
+
+ReplicaSets
+<ul>
+{{ range $i := .Resources.ReplicaSets }}
+<li class="rs"><a href="/kubernetes/delete/rs/{{ $i.ObjectMeta.Name }}">{{ $i.ObjectMeta.Name }}</a></li>
+{{ end }}
+</ul> 
+
+Services
+<ul>
+{{ range $i := .Resources.Services }}
+<li class="svc"><a href="/kubernetes/delete/svc/{{ $i.ObjectMeta.Name }}">{{ $i.ObjectMeta.Name }}</a></li>
+{{ end }}
+</ul> 
+
+
+</div>
+
 <table class="table table-hover">
 <thead>
 <tr><th>Variable name</th><th>Value</th></tr>

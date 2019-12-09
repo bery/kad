@@ -15,6 +15,8 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	apps_v1 "k8s.io/api/apps/v1"
+	v1 "k8s.io/api/core/v1"
 )
 
 type pageContent struct {
@@ -29,14 +31,23 @@ type pageContent struct {
 	Help           string
 	Ready          bool
 	Color          string
+	Resources      Resources
 
-	Request *http.Request
+	Request        *http.Request
+	KubernetesHost string
 }
 
 type envVar struct {
 	Name      string
 	Value     string
 	Dangerous bool
+}
+
+type Resources struct {
+	Pods        []v1.Pod
+	Services    []v1.Service
+	Deployments []apps_v1.Deployment
+	ReplicaSets []apps_v1.ReplicaSet
 }
 
 func (e *envVar) detect() {
@@ -142,7 +153,10 @@ func addHit() error {
 	} else {
 		// use redis
 		client := redis.NewClient(&redis.Options{
-			Addr: pc.RedisHost,
+			Addr:         pc.RedisHost,
+			DialTimeout:  300 * time.Millisecond,
+			ReadTimeout:  300 * time.Millisecond,
+			WriteTimeout: 300 * time.Millisecond,
 		})
 
 		defer client.Close()
@@ -180,6 +194,7 @@ func main() {
 	r.HandleFunc("/slow", slowHandler)
 	r.HandleFunc("/check/live", liveHandler)
 	r.HandleFunc("/check/ready", readyHandler)
+	r.HandleFunc("/kubernetes/delete/{type}/{name}", kubernetesDeleteHandler)
 	r.Handle("/metrics", promhttp.Handler())
 
 	adminRouter.HandleFunc("/action/terminate", terminateHandler)

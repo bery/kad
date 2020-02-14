@@ -33,8 +33,11 @@ type pageContent struct {
 	Color          string
 	Resources      Resources
 
-	Request        *http.Request
-	KubernetesHost string
+	PageRefresh bool
+
+	Request         *http.Request
+	KubernetesError string
+	KubernetesHost  string
 }
 
 type envVar struct {

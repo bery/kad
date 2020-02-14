@@ -54,7 +54,9 @@ li.svc {
 	background-color: #dcea64;
 }
 </style>
+{{ if .PageRefresh }}
 <meta http-equiv="refresh" content="2">
+{{ end }}
 </head>
 
 <body>
@@ -95,6 +97,11 @@ li.svc {
 <div class="alert alert-danger">This replica isn't ready.</div>
 {{ end }}
 
+
+{{ if .KubernetesError }}
+<div class="alert alert-warning">Failed accesing Kubernetes: <code>{{ .KubernetesError }}</code></div>
+{{ end }}
+
 <div class="doc">
 <b>Endpoints (port 5000):</b>
 <ul>
@@ -133,6 +140,7 @@ Contribution is apprecited at <a href="https://gitlab.com/6shore.net/kad">gitlab
 <div class="col-sm-6">
 <div class="doc">
 
+{{ if .KubernetesHost }}
 <p>
 Kubernetes at <a href="{{ .KubernetesHost }}">{{ .KubernetesHost }}</a>
 </p>
@@ -164,6 +172,8 @@ Services
 <li class="svc"><a href="/kubernetes/delete/svc/{{ $i.ObjectMeta.Name }}">{{ $i.ObjectMeta.Name }}</a></li>
 {{ end }}
 </ul> 
+
+{{ end }}
 
 
 </div>

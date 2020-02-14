@@ -30,7 +30,9 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	readConfig()
 
 	// read resources from kubernetes
-	readResources()
+	if err := readResources(); err != nil {
+		pc.KubernetesError = err.Error()
+	}
 
 	// render template
 	t, err := template.New("tpl").Parse(rootPage)

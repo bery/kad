@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"os"
 	"runtime"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {

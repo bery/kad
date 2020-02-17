@@ -12,6 +12,7 @@ require (
 	github.com/prometheus/client_model v0.0.0-20171117100541-99fa1f4be8e5 // indirect
 	github.com/prometheus/common v0.0.0-20180518154759-7600349dcfe1 // indirect
 	github.com/prometheus/procfs v0.0.0-20180612222113-7d6f385de8be // indirect
+	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v0.0.5
 	golang.org/x/crypto v0.0.0-20191002192127-34f69633bfdc // indirect
 	golang.org/x/time v0.0.0-20190921001708-c4c64cad1fd0 // indirect

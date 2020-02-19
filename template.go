@@ -138,9 +138,10 @@ Contribution is apprecited at <a href="https://gitlab.com/6shore.net/kad">gitlab
 
 </div>
 <div class="col-sm-6">
+
+{{ if not .KubernetesError }}
 <div class="doc">
 
-{{ if .KubernetesHost }}
 <p>
 Kubernetes at <a href="{{ .KubernetesHost }}">{{ .KubernetesHost }}</a>
 </p>
@@ -173,10 +174,8 @@ Services
 {{ end }}
 </ul> 
 
-{{ end }}
-
-
 </div>
+{{ end }}
 
 <table class="table table-hover">
 <thead>

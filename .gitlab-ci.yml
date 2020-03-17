@@ -7,7 +7,7 @@ variables:
   REGISTRY_IMAGE: docker.io/tomkukral/kad
   REGISTRY_SERVER: docker.io
   GOPATH: ${CI_PROJECT_DIR}/_gopath/
-  IMAGE_GO_BUILDER: golang:1.12
+  IMAGE_GO_BUILDER: golang:1.14
   IMAGE_GO_BUILDER_LATEST: golang:latest
 
 stages:

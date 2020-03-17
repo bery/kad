@@ -132,7 +132,7 @@ func addHit() error {
 
 	}
 
-	pageHits.Set(float64(pc.Hits))
+	pageHits.Observe(float64(pc.Hits))
 
 	return nil
 }

@@ -6,7 +6,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-var pageHits = prometheus.NewCounter(prometheus.CounterOpts{
+var pageHits = prometheus.NewSummary(prometheus.SummaryOpts{
 	Name: "page_hits",
 	Help: "Number of page visits",
 })

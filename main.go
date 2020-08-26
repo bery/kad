@@ -232,6 +232,7 @@ func main() {
 		},
 	}
 	rootCmd.PersistentFlags().String("color", "", "Background color for main page")
+	rootCmd.PersistentFlags().String("user", "", "Dummy flag")
 	rootCmd.PersistentFlags().Bool("fail", false, "Fail with non-zero exit code")
 	rootCmd.Execute()
 

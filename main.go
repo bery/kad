@@ -9,6 +9,7 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
+	"go.uber.org/zap"
 
 	"github.com/go-redis/redis"
 	"github.com/gorilla/handlers"
@@ -63,17 +64,17 @@ func (e *envVar) detect() {
 		strings.Contains(dv, "key")
 }
 
-var listen = ":5000"
-var listenAdmin = ":5001"
-var configFile = "/etc/kad/config.yml"
-var pc = pageContent{
-	Vars:           make(map[string]*envVar),
-	Hits:           0,
-	Cmd:            "",
-	ConfigFilePath: configFile,
-}
-
 var (
+	listen      = ":5000"
+	listenAdmin = ":5001"
+	configFile  = "/etc/kad/config.yml"
+	pc          = pageContent{
+		Vars:           make(map[string]*envVar),
+		Hits:           0,
+		Cmd:            "",
+		ConfigFilePath: configFile,
+	}
+
 	checkReady = true
 	readyFile  = "/tmp/notready"
 
@@ -153,13 +154,20 @@ func readConfig() {
 }
 
 func main() {
+	l, err := zap.NewProduction()
+	if err != nil {
+		panic(err)
+	}
+	defer l.Sync()
+
 	var rootCmd = &cobra.Command{
 		Use: "kad",
 		Run: func(cmd *cobra.Command, args []string) {
 			var err error
 
 			if cmd.Flag("fail").Value.String() == "true" {
-				log.Fatal("Remove --fail command parameter to start properly")
+				l.Info("Remove --fail command parameter to start properly")
+				panic("fail option is enabled")
 			}
 
 			// read environment variables
@@ -215,7 +223,7 @@ func main() {
 			loggedAdminRouter := handlers.LoggingHandler(os.Stdout, adminRouter)
 
 			go func() {
-				log.Printf("Listening on %s\n", listen)
+				l.Info("Listening on client port", zap.String("socket", listen))
 				if err := http.ListenAndServe(listen, loggedRouter); err != nil {
 					log.Printf("Server failed with: %s", err)
 				}

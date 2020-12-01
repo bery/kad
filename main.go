@@ -194,6 +194,7 @@ func main() {
 			r.HandleFunc("/", rootHandler)
 			r.HandleFunc("/heavy", heavyHandler)
 			r.HandleFunc("/slow", slowHandler)
+			r.HandleFunc("/hostname", hostnameHandler)
 			r.HandleFunc("/check/live", liveHandler)
 			r.HandleFunc("/check/ready", readyHandler)
 			r.HandleFunc("/kubernetes/delete/{type}/{name}", kubernetesDeleteHandler)

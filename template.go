@@ -110,6 +110,7 @@ li.svc {
 	<li><a>/check/live</a> - liveness probe, always OK</li>
 	<li><a>/check/ready</a> - readiness probo, ready if file <code>/tmp/notready</code> doesn't exist</li>
 	<li><a>/metrics</a> - <a href="https://prometheus.io/">Prometheus</a> metrics</li>
+	<li><a>/hostname</a> - prints hostname
 </ul>
 
 <b>Admin endpoints (port 5001):</b>

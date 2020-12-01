@@ -104,3 +104,13 @@ func slowHandler(w http.ResponseWriter, r *http.Request) {
 	time.Sleep(3 * time.Second)
 	fmt.Fprintf(w, "Executed slow load\n")
 }
+
+// return hostname
+func hostnameHandler(w http.ResponseWriter, r *http.Request) {
+	hn, err := os.Hostname()
+	if err != nil {
+		fmt.Fprintf(w, "Failed reading hostname: %s", err)
+	} else {
+		fmt.Fprint(w, hn)
+	}
+}

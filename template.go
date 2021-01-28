@@ -74,7 +74,7 @@ li.svc {
 
 
 {{ if .RedisHost }}
-<div class="alert alert-info">Redis server is <code>{{ .RedisHost }}</code></div>
+<div class="alert alert-info">Redis server is <code>{{ .RedisHost }}, paht {{ .RedisPath }}</code></div>
 {{ else }}
 <div class="alert alert-warning">Redis server not used, set <code>REDIS_SERVER</code> to use it.</div>
 {{ end }}

@@ -19,6 +19,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 		pc.RedisError = err.Error()
 	} else {
 		pc.RedisError = ""
+		pc.RedisPath = redisPath()
 	}
 
 	// check ready file

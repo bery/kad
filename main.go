@@ -124,7 +124,10 @@ func addHit() error {
 
 		defer client.Close()
 
-		hits, err := client.Incr("hits").Result()
+		cluster := os.Getenv("CLUSTER")
+		path := fmt.Sprintf("hits-%s", cluster)
+
+		hits, err := client.Incr(path).Result()
 		if err != nil {
 			return fmt.Errorf("Unable to inc hits in redis: %s", err)
 		}

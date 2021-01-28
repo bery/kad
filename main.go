@@ -25,6 +25,7 @@ type pageContent struct {
 	Hostname       string
 	Hits           int
 	RedisHost      string
+	RedisPath      string
 	RedisError     string
 	Cmd            string
 	ConfFile       string
@@ -108,6 +109,11 @@ func isReady() bool {
 	return err != nil
 }
 
+func redisPath() string {
+	cluster := os.Getenv("CLUSTER")
+	return fmt.Sprintf("hits-%s", cluster)
+}
+
 func addHit() error {
 	if pc.RedisHost == "" {
 		// Use pc variable
@@ -124,10 +130,7 @@ func addHit() error {
 
 		defer client.Close()
 
-		cluster := os.Getenv("CLUSTER")
-		path := fmt.Sprintf("hits-%s", cluster)
-
-		hits, err := client.Incr(path).Result()
+		hits, err := client.Incr(redisPath()).Result()
 		if err != nil {
 			return fmt.Errorf("Unable to inc hits in redis: %s", err)
 		}

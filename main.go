@@ -35,12 +35,18 @@ type pageContent struct {
 	Ready          bool
 	Color          string
 	Resources      Resources
+	Headers        []Header
 
 	PageRefresh bool
 
 	Request         *http.Request
 	KubernetesError string
 	KubernetesHost  string
+}
+
+type Header struct {
+	Name  string
+	Value string
 }
 
 type envVar struct {

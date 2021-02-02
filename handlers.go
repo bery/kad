@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -27,6 +28,14 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 
 	// store request
 	pc.Request = r
+
+	// headers
+	pc.Headers = []Header{}
+	for k, v := range r.Header {
+		va := strings.Join(v, " ")
+		ha := Header{Name: k, Value: va}
+		pc.Headers = append(pc.Headers, ha)
+	}
 
 	// update config file context
 	readConfig()

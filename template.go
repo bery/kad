@@ -53,6 +53,7 @@ li.rs {
 li.svc {
 	background-color: #dcea64;
 }
+table td { word-wrap:break-word; }
 </style>
 {{ if .PageRefresh }}
 <meta http-equiv="refresh" content="2">
@@ -137,6 +138,7 @@ Contribution is apprecited at <a href="https://gitlab.com/6shore.net/kad">gitlab
 </div>
 
 
+
 </div>
 <div class="col-sm-6">
 
@@ -191,6 +193,24 @@ Services
 </div>
 
 </div> <!-- row -->
+
+
+<table class="table table-hover">
+<thead>
+<tr><th> Header name</th><th>Value</th></tr>
+</thead>
+<tbody>
+
+{{ with .Headers }}
+{{ range . }}
+	<tr><td>{{ .Name }}</td><td>{{ .Value }}</td></tr>
+{{ end }}
+{{ end }}
+
+</tbody>
+</table>
+
+
 </div> <!-- container -->
 
 </body>

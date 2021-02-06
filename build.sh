@@ -20,7 +20,7 @@ echo "Image digest is ${DIGEST}"
 podman image sign --sign-by tom+imagesign@6shore.net -d /var/lib/atomic/sigstore "docker://${R_TAG}"
 
 # sync staging signatures with sigstore
-scp -vr /var/lib/atomic/sigstore/tomkukral/ lemur.6shore.net:/mnt/storage/sigstore/
+mc mirror /var/lib/atomic/sigstore/ obj/sigstore/
 
 # try to pull image
 podman pull --log-level debug "${R_TAG}"

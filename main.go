@@ -236,7 +236,7 @@ func main() {
 			}()
 
 			go func() {
-				log.Printf("Listening admin interface on %s\n", listenAdmin)
+				l.Info("Listening on admin port", zap.String("socket", listenAdmin))
 				if err := http.ListenAndServe(listenAdmin, loggedAdminRouter); err != nil {
 					log.Printf("Admin server failed with: %s", err)
 				}

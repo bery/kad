@@ -19,11 +19,13 @@ spec:
     repoURL: https://gitlab.com/6shore.net/kad.git
     targetRevision: HEAD
     helm:
-      parameters:
-      - name: cluster
-        value: "{{ $cluster }}"
-      - name: replicas
-        value: "{{ $values.replicas }}"
+      values: |
+        cluster: "{{ $cluster }}"
+        replicas: "{{ $values.replicas }}"
+        fallbacks:
+        {{- range $hi, $fb := .Values.clusters }} 
+        - {{ $fb }}
+        {{- end }}
   project: default
   syncPolicy:
     automated:

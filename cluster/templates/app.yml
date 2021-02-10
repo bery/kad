@@ -23,7 +23,7 @@ spec:
         cluster: "{{ $cluster }}"
         replicas: "{{ $values.replicas }}"
         fallbacks:
-        {{- range $hi, $fb := .Values.clusters }} 
+        {{- range $hi, $fb := $values.clusters }} 
         - {{ $fb }}
         {{- end }}
   project: default

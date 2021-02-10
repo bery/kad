@@ -1,0 +1,22 @@
+{{- range $h, $cluster := .Values.clusters }} 
+#
+# Cluster {{ $cluster }}
+#
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kad
+spec:
+  destination:
+    namespace: kad
+    name: {{ $cluster }}
+  source:
+    path: helm
+    repoURL: https://gitlab.com/6shore.net/kad.git
+    targetRevision: HEAD
+  project: default
+  syncPolicy:
+    automated: null
+    syncOptions:
+      - CreateNamespace=true
+{{ end }}

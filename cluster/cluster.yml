@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kad-cluster
+  namespace: argo
+spec:
+  project: default
+  source:
+    repoURL: https://gitlab.com/6shore.net/kad
+    targetRevision: HEAD
+    path: argoapp
+    helm:
+      values: |
+        clusters: 
+        - c0
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argo
+  syncPolicy:
+   automated:
+     prune: true
+     selfHeal: true
+   syncOptions:
+   - Validate=true
+   - CreateNamespace=true

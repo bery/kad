@@ -118,6 +118,11 @@ func slowHandler(w http.ResponseWriter, r *http.Request) {
 // return hostname
 func hostnameHandler(w http.ResponseWriter, r *http.Request) {
 	hn, err := os.Hostname()
+
+	if c := os.Getenv("CLUSTER"); c != "" {
+		hn = fmt.Sprintf("%s/%s", c, hn)
+	}
+
 	if err != nil {
 		fmt.Fprintf(w, "Failed reading hostname: %s", err)
 	} else {

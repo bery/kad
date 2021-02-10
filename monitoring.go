@@ -27,6 +27,14 @@ var httpDuration = prometheus.NewHistogramVec(
 	[]string{"method", "endpoint"},
 )
 
+var randomMet = prometheus.NewCounterVec(
+	prometheus.CounterOpts{
+		Name: "random",
+		Help: "Random metrics with many labels",
+	},
+	[]string{"rn"},
+)
+
 func init() {
 	err := prometheus.Register(pageHits)
 	if err != nil {
@@ -39,6 +47,11 @@ func init() {
 	}
 
 	err = prometheus.Register(httpDuration)
+	if err != nil {
+		log.Printf("Unable to register pageHits: %s", err)
+	}
+
+	err = prometheus.Register(randomMet)
 	if err != nil {
 		log.Printf("Unable to register pageHits: %s", err)
 	}

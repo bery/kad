@@ -24,7 +24,7 @@ spec:
         replicas: "{{ $values.replicas }}"
         fallbacks:
         {{- range $hi, $fb := $values.clusters }} 
-        - {{ $fb }}
+        {{ if eq $fb $cluster }}#{{ end }}- {{ $fb }}
         {{- end }}
   project: default
   syncPolicy:

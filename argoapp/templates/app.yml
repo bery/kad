@@ -16,6 +16,12 @@ spec:
     path: helm
     repoURL: https://gitlab.com/6shore.net/kad.git
     targetRevision: HEAD
+    helm:
+      parameters:
+      - name: cluster
+        value: {{ $cluster }}
+      - name: replicas
+        vlaue: {{ .Values.replicas }}
   project: default
   syncPolicy:
     automated:

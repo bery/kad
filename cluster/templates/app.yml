@@ -20,9 +20,9 @@ spec:
     helm:
       parameters:
       - name: cluster
-        value: {{ $cluster }}
+        value: "{{ $cluster }}"
       - name: replicas
-        value: {{ $values.replicas }}
+        value: "{{ $values.replicas }}"
   project: default
   syncPolicy:
     automated:

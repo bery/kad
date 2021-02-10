@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"os"
 	"strings"
@@ -107,6 +108,14 @@ func responseTime(next http.Handler) http.Handler {
 				"method":   r.Method,
 				"endpoint": r.URL.String(),
 			}).Add(1)
+
+		// set random metrics
+		rn := fmt.Sprintf("%d", rand.Intn(1000))
+		randomMet.With(
+			prometheus.Labels{
+				"rn": rn,
+			}).Add(1)
+
 	})
 }
 
@@ -223,6 +232,7 @@ func main() {
 			adminRouter.HandleFunc("/action/terminate", terminateHandler)
 			adminRouter.HandleFunc("/check/live", liveHandler)
 			adminRouter.HandleFunc("/check/ready", readyHandler)
+			adminRouter.Handle("/metrics", promhttp.Handler())
 
 			// log requests
 			loggedRouter := handlers.LoggingHandler(os.Stdout, responseTime(r))

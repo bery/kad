@@ -1,0 +1,10 @@
+{{- range $h, $fb := .Values.fallbacks }} 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kad-fallback-{{ $h }}
+spec:                                                                                        
+  type: ExternalName
+  externalName: {{ $fb }}
+{{ end }}

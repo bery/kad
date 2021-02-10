@@ -23,9 +23,9 @@ spec:
         cluster: "{{ $cluster }}"
         replicas: "{{ $values.replicas }}"
         fallbacks:
-        {{- range $hi, $fb := $values.clusters }} 
-        {{ if eq $fb $cluster }}#{{ end }}- kad.{{ $fb }}.k8s.6shore.net
-        {{- end }}
+        #{{- range $hi, $fb := $values.clusters }} 
+        #{{ if eq $fb $cluster }}#{{ end }}- kad.{{ $fb }}.k8s.6shore.net
+        #{{- end }}
   project: default
   syncPolicy:
     automated:

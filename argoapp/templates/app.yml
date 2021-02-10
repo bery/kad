@@ -5,7 +5,9 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kad
+  name: kad-{{ $cluster }}
+  labels:
+    cluster: {{ $cluster }}
 spec:
   destination:
     namespace: kad
@@ -18,5 +20,5 @@ spec:
   syncPolicy:
     automated: null
     syncOptions:
-      - CreateNamespace=true
+    - CreateNamespace=true
 {{ end }}

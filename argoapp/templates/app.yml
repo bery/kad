@@ -1,3 +1,4 @@
+{{- $values := .Values -}}
 {{- range $h, $cluster := .Values.clusters }} 
 #
 # Cluster {{ $cluster }}
@@ -21,7 +22,7 @@ spec:
       - name: cluster
         value: {{ $cluster }}
       - name: replicas
-        vlaue: {{ .Values.replicas }}
+        value: {{ $values.replicas }}
   project: default
   syncPolicy:
     automated:

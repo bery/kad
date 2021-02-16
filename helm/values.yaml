@@ -3,10 +3,10 @@ cluster: unknown
 replicas: 2
 
 ingress:
-  enabled: true
+  enabled: false
   clusterhost: kad.6shore.net
 
 rbac:
-  enabled: true
+  enabled: false
 
 fallbacks: []

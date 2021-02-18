@@ -9,4 +9,7 @@ ingress:
 rbac:
   enabled: false
 
+prometheus:
+  enabled: true
+
 fallbacks: []

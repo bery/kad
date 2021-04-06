@@ -10,6 +10,8 @@ metadata:
   name: kad-{{ $cluster }}
   labels:
     cluster: {{ $cluster }}
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     namespace: {{ if hasPrefix "vk8s" $cluster }}default{{ else }}kad{{ end }}

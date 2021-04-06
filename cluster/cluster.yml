@@ -1,18 +1,22 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kad-cluster
+  name: kad
   namespace: argo
 spec:
   project: default
   source:
     repoURL: https://gitlab.com/6shore.net/kad
     targetRevision: HEAD
-    path: argoapp
+    path: cluster
     helm:
       values: |
         clusters: 
         - c0
+        - physical
+        - vk8s-ce
+        #- vk8s-re
+        replicas: 3
   destination:
     server: https://kubernetes.default.svc
     namespace: argo

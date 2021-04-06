@@ -12,7 +12,7 @@ metadata:
     cluster: {{ $cluster }}
 spec:
   destination:
-    namespace: kad
+    namespace: {{ if hasPrefix "vk8s" $cluster }}default{{ else }}kad{{ end }}
     name: {{ $cluster }}
   source:
     path: helm

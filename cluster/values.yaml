@@ -1,2 +1,2 @@
-clusters: []
+clusters: [c0, c1, vk8s-ce]
 replicas: 1

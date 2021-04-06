@@ -1,4 +1,4 @@
-{{ if .Values.ingress.enabled }}
+{{ if and (.Values.ingress.enabled) (not (hasPrefix "vk8s" .Values.cluster)) }}
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware

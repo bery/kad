@@ -15,12 +15,17 @@ podman build \
 # parse digest
 DIGEST="$(podman inspect tomkukral/kad | jq -r '.[0].Digest')"
 echo "Image digest is ${DIGEST}"
+read
 
 # sign image
 podman image sign --sign-by tom+imagesign@6shore.net -d /var/lib/atomic/sigstore "docker://${R_TAG}"
+read
+
+podman push "${R_TAG}"
 
 # sync staging signatures with sigstore
 mc mirror /var/lib/atomic/sigstore/ obj/sigstore/
+read
 
 # try to pull image
 podman pull --log-level debug "${R_TAG}"

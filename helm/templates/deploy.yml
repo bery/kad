@@ -13,6 +13,7 @@ spec:
     targetPort: 5000
     port: 80
 ---
+{{ if not (hasPrefix "vk8s" .Values.cluster) }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -25,6 +26,7 @@ spec:
   - protocol: TCP
     port: 6379
 ---
+{{ end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -54,6 +56,7 @@ spec:
             fieldRef:
               fieldPath: spec.nodeName
 ---
+{{ if not (hasPrefix "vk8s" .Values.cluster) }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -73,3 +76,4 @@ spec:
         image: redis
         ports:
         - containerPort: 6379
+{{ end }}

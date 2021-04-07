@@ -14,7 +14,7 @@ metadata:
   - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
-    namespace: {{ if hasPrefix "vk8s" $cluster }}default{{ else }}kad{{ end }}
+    namespace: {{ if hasPrefix "vk8s" $cluster }}{{ if hasPrefix "vk8s-re" $cluster }}kad-re{{ else }}default{{ end }}{{ else }}kad{{ end }}
     name: {{ $cluster }}
   source:
     path: helm

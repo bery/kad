@@ -122,6 +122,12 @@ func hostnameHandler(w http.ResponseWriter, r *http.Request) {
 	if c := os.Getenv("CLUSTER"); c != "" {
 		hn = fmt.Sprintf("%s/%s", c, hn)
 	}
+	if c := os.Getenv("VES_IO_SITENAME"); c != "" {
+		hn = fmt.Sprintf("%s/%s", c, hn)
+	}
+	if c := os.Getenv("VES_IO_REGION"); c != "" {
+		hn = fmt.Sprintf("%s/%s", c, hn)
+	}
 
 	if err != nil {
 		fmt.Fprintf(w, "Failed reading hostname: %s", err)

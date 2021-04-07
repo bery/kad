@@ -16,7 +16,7 @@ spec:
         - physical
         - vk8s-ce
         #- vk8s-re
-        replicas: 3
+        replicas: 1
   destination:
     server: https://kubernetes.default.svc
     namespace: argo

@@ -43,6 +43,8 @@ type pageContent struct {
 	Request         *http.Request
 	KubernetesError string
 	KubernetesHost  string
+
+	PersistentFiles []string
 }
 
 type Header struct {
@@ -266,4 +268,27 @@ func main() {
 	rootCmd.PersistentFlags().Bool("fail", false, "Fail with non-zero exit code")
 	rootCmd.Execute()
 
+}
+
+func readPersistentFiles() []string {
+	dataDir := os.Getenv("DATADIR")
+	if dataDir == "" {
+		dataDir = "/data"
+	}
+
+	r := []string{}
+	files, err := ioutil.ReadDir(dataDir)
+	if err != nil {
+		return r
+	}
+
+	for _, f := range files {
+		if f.IsDir() {
+			r = append(r, f.Name()+" (d)")
+		} else {
+			r = append(r, f.Name())
+		}
+	}
+
+	return r
 }

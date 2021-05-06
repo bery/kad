@@ -6,8 +6,7 @@ var rootPage = `
 
 <head>
 <title>Kubernetes app demo</title>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
 <style>
 td {
 	font-size: 70%;
@@ -101,6 +100,19 @@ table td { word-wrap:break-word; }
 
 {{ if .KubernetesError }}
 <div class="alert alert-warning">Failed accesing Kubernetes: <code>{{ .KubernetesError }}</code></div>
+{{ end }}
+
+{{ if .PersistentFiles }}
+<div class="alert alert-info">
+Persistent files:<br>
+<ul>
+{{ with .PersistentFiles }}
+{{ range . }}
+	<li><code>{{ . }}</code></li>
+{{ end }}
+{{ end }}
+</ul>
+</div>
 {{ end }}
 
 <div class="doc">
@@ -197,10 +209,9 @@ Services
 
 <table class="table table-hover">
 <thead>
-<tr><th> Header name</th><th>Value</th></tr>
+<tr><th>Header name</th><th>Value</th></tr>
 </thead>
 <tbody>
-
 {{ with .Headers }}
 {{ range . }}
 	<tr><td>{{ .Name }}</td><td>{{ .Value }}</td></tr>

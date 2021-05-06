@@ -45,6 +45,8 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 		pc.KubernetesError = err.Error()
 	}
 
+	pc.PersistentFiles = readPersistentFiles()
+
 	// render template
 	t, err := template.New("tpl").Parse(rootPage)
 	if err != nil {

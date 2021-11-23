@@ -93,7 +93,7 @@ table td { word-wrap:break-word; }
 
 
 {{ if .ConfFile }}
-<div class="alert alert-info">Config file <code>/etc/kad/config.yml</code>content:<br><code><pre>{{ .ConfFile }}<pre></code></div>
+<div class="alert alert-info">Config file <code>/etc/kad/config.yml</code> content:<br><code><pre>{{ .ConfFile }}<pre></code></div>
 {{ else }}
 <div class="alert alert-warning">Config file <code>/etc/kad/config.yml</code> is empty.</code></div>
 {{ end }}

@@ -26,7 +26,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 
 	// check failure probability
 	if pc.FailureProbability > 0 {
-		if rf := rand.Float64(); rf > pc.FailureProbability {
+		if rf := rand.Float64(); rf <= pc.FailureProbability {
 			es := fmt.Sprintf("Failing due to probability set to %.2f, got %.2f. Retry your request.", pc.FailureProbability, rf)
 
 			log.Printf("Request failure probabilty applied on request")

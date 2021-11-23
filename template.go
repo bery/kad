@@ -87,8 +87,13 @@ table td { word-wrap:break-word; }
 <div class="alert alert-info">Started with command <code>{{ .Cmd }}</code></div>
 {{ end }}
 
+{{ if .FailureProbability }}
+<div class="alert alert-info">Request will be failing with probabilty <code>{{ .FailureProbability }}</code></div>
+{{ end }}
+
+
 {{ if .ConfFile }}
-<div class="alert alert-info">Config file content:<br><code><pre>{{ .ConfFile }}<pre></code></div>
+<div class="alert alert-info">Config file <code>/etc/kad/config.yml</code>content:<br><code><pre>{{ .ConfFile }}<pre></code></div>
 {{ else }}
 <div class="alert alert-warning">Config file <code>/etc/kad/config.yml</code> is empty.</code></div>
 {{ end }}
@@ -136,6 +141,8 @@ Persistent files:<br>
 <b>Command options:</b>
 <ul>
 	<li><a>--color</a> - Set background color</li>
+	<li><a>--fail</a> - Terminate with non-zero exit code (immediatelly)</li>
+	<li><a>--failure-probability</a> - Request to / will be failing with this probability</li>
 </ul>
 
 

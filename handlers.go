@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"math/rand"
 	"net/http"
 	"os"
 	"runtime"
@@ -21,6 +22,18 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		pc.RedisError = ""
 		pc.RedisPath = redisPath()
+	}
+
+	// check failure probability
+	if pc.FailureProbability > 0 {
+		if rf := rand.Float64(); rf > pc.FailureProbability {
+			es := fmt.Sprintf("Failing due to probability set to %.2f, got %.2f. Retry your request.", pc.FailureProbability, rf)
+
+			log.Printf("Request failure probabilty applied on request")
+
+			http.Error(w, es, http.StatusInternalServerError)
+			return
+		}
 	}
 
 	// check ready file

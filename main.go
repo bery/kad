@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -44,7 +45,8 @@ type pageContent struct {
 	KubernetesError string
 	KubernetesHost  string
 
-	PersistentFiles []string
+	PersistentFiles    []string
+	FailureProbability float64
 }
 
 type Header struct {
@@ -187,6 +189,19 @@ func main() {
 				panic("fail option is enabled")
 			}
 
+			if fpr := cmd.Flag("failure-probability").Value.String(); fpr != "" {
+				fp, err := strconv.ParseFloat(fpr, 64)
+				if err != nil {
+					log.Fatalf("Failed reading request failure probability (%s): %s", fpr, err)
+				}
+				if fp > 1 || fp < 0 {
+					log.Fatal("Failure probabilty must be between 0 and 1")
+				}
+
+				pc.FailureProbability = fp
+				l.Info("Request failure probablity set", zap.Float64("probabilty", fp))
+			}
+
 			// read environment variables
 			for _, v := range os.Environ() {
 				pair := strings.Split(v, "=")
@@ -254,18 +269,16 @@ func main() {
 				}
 			}()
 
-			select {
-			case err := <-exit:
-				if err != nil {
-					log.Printf("Terminating with error: %s", err)
-				}
-
+			err = <-exit
+			if err != nil {
+				log.Printf("Terminating with error: %s", err)
 			}
 
 		},
 	}
 	rootCmd.PersistentFlags().String("color", "", "Background color for main page")
 	rootCmd.PersistentFlags().Bool("fail", false, "Fail with non-zero exit code")
+	rootCmd.PersistentFlags().Float64("failure-probability", 0, "Failure probability for user requests (applies only on /, must be between 0 and 1)")
 	rootCmd.Execute()
 
 }

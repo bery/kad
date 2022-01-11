@@ -120,6 +120,11 @@ Persistent files:<br>
 </div>
 {{ end }}
 
+{{ if ne .RemoteAddr "" }}
+<div class="alert alert-info">Remote address: <code>{{ .RemoteAddr }}</code></div>
+{{ end }}
+
+
 <div class="doc">
 <b>Endpoints (port 5000):</b>
 <ul>

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"math/rand"
+	"net"
 	"net/http"
 	"os"
 	"runtime"
@@ -39,6 +40,12 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 
 	// store request
 	pc.Request = r
+
+	// read remote addr
+	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err == nil {
+		pc.RemoteAddr = host
+	}
 
 	// headers
 	pc.Headers = []Header{}

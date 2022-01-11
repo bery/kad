@@ -47,6 +47,8 @@ type pageContent struct {
 
 	PersistentFiles    []string
 	FailureProbability float64
+
+	RemoteAddr string
 }
 
 type Header struct {

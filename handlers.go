@@ -12,16 +12,19 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
-	ctx := r.Context()
+	ctx, span := tracer.Start(r.Context(), "heavy")
+	defer span.End()
 
 	err = addHit()
 	if err != nil {
 		log.Printf("Redis error: %e", err)
 		pc.RedisError = err.Error()
+		span.RecordError(err)
 	} else {
 		pc.RedisError = ""
 		pc.RedisPath = redisPath()
@@ -70,10 +73,12 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	// render template
 	t, err := template.New("tpl").Parse(rootPage)
 	if err != nil {
+		span.RecordError(err)
 		log.Printf("Unable to parse template: %s", err)
 	}
 	err = t.Execute(w, pc)
 	if err != nil {
+		span.RecordError(err)
 		log.Printf("Unable to execute template: %s", err)
 	}
 }
@@ -107,17 +112,27 @@ func terminateHandler(w http.ResponseWriter, r *http.Request) {
 
 // make heavy computation
 func heavyHandler(w http.ResponseWriter, r *http.Request) {
+	ctx, span := tracer.Start(r.Context(), "heavy")
+	defer span.End()
+
 	fmt.Fprintf(w, "Starting heavy load")
 
 	go func() {
+		_, span := tracer.Start(ctx, "heavy-goroutines")
+		defer span.End()
+
 		f, err := os.Open(os.DevNull)
 		if err != nil {
+			span.RecordError(err)
 			panic(err)
 		}
 		defer f.Close()
 
 		n := runtime.NumCPU()
 		runtime.GOMAXPROCS(n)
+		span.SetAttributes(
+			attribute.Int("goroutines", n),
+		)
 
 		for i := 0; i < n; i++ {
 			go func() {
@@ -133,7 +148,10 @@ func heavyHandler(w http.ResponseWriter, r *http.Request) {
 
 // make slow response
 func slowHandler(w http.ResponseWriter, r *http.Request) {
+	_, span := tracer.Start(r.Context(), "sleep")
 	time.Sleep(3 * time.Second)
+	defer span.End()
+
 	fmt.Fprintf(w, "Executed slow load\n")
 }
 

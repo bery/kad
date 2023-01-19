@@ -6,6 +6,7 @@ import (
 	"os"
 
 	log "github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/gorilla/mux"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -47,15 +48,20 @@ func getClientset() (*kubernetes.Clientset, error) {
 }
 
 // read kubernetes resources in current namespaces and save it to rootPage
-func readResources(ctx context.Context) error {
+func readResources(ictx context.Context) error {
+	ctx, span := tracer.Start(ictx, "read-k8s-resources")
+	defer span.End()
+
 	cs, err := getClientset()
 	if err != nil {
+		span.RecordError(err)
 		return err
 	}
 
 	// list pods
 	pl, err := cs.CoreV1().Pods(namespace).List(ctx, metav1.ListOptions{})
 	if err != nil {
+		span.RecordError(err)
 		return err
 	}
 	pc.Resources.Pods = pl.Items
@@ -63,6 +69,7 @@ func readResources(ctx context.Context) error {
 	// list services
 	sl, err := cs.CoreV1().Services(namespace).List(ctx, metav1.ListOptions{})
 	if err != nil {
+		span.RecordError(err)
 		return err
 	}
 	pc.Resources.Services = sl.Items
@@ -70,6 +77,7 @@ func readResources(ctx context.Context) error {
 	// list deployments
 	dl, err := cs.AppsV1().Deployments(namespace).List(ctx, metav1.ListOptions{})
 	if err != nil {
+		span.RecordError(err)
 		return err
 	}
 	pc.Resources.Deployments = dl.Items
@@ -77,6 +85,7 @@ func readResources(ctx context.Context) error {
 	// list replicasets
 	rl, err := cs.AppsV1().ReplicaSets(namespace).List(ctx, metav1.ListOptions{})
 	if err != nil {
+		span.RecordError(err)
 		return err
 	}
 	pc.Resources.ReplicaSets = rl.Items
@@ -85,9 +94,10 @@ func readResources(ctx context.Context) error {
 }
 
 func kubernetesDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
+	ctx, span := tracer.Start(r.Context(), "delete-k8s-resources")
+	defer span.End()
 
-	ctx := r.Context()
+	vars := mux.Vars(r)
 
 	log.Printf("Kubernetes delete with %+v", vars)
 
@@ -108,6 +118,11 @@ func kubernetesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Can't connect to kubernetes", http.StatusBadRequest)
 		return
 	}
+
+	span.SetAttributes(
+		attribute.String("resources.name", name),
+		attribute.String("resource.type", rt),
+	)
 
 	dp := metav1.DeletePropagationBackground
 	one := int64(1)

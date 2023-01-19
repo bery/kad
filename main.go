@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
@@ -10,7 +11,15 @@ import (
 	"strings"
 	"time"
 
+	"go.opentelemetry.io/otel/sdk/resource"
+	tracesdk "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
+
 	log "github.com/sirupsen/logrus"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/jaeger"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.uber.org/zap"
 
 	"github.com/go-redis/redis"
@@ -93,6 +102,7 @@ var (
 
 	exit      = make(chan error)
 	exitDelay = 15 * time.Second
+	tracer    = otel.Tracer("go.6shore.net/kad")
 )
 
 func responseTime(next http.Handler) http.Handler {
@@ -137,6 +147,7 @@ func redisPath() string {
 }
 
 func addHit() error {
+	// TODO: add tracing
 	if pc.RedisHost == "" {
 		// Use pc variable
 		pc.Hits = pc.Hits + 1
@@ -201,7 +212,7 @@ func main() {
 				}
 
 				pc.FailureProbability = fp
-				l.Info("Request failure probablity set", zap.Float64("probabilty", fp))
+				l.Info("Request failure probablity set", zap.Float64("probability", fp))
 			}
 
 			// read environment variables
@@ -234,7 +245,26 @@ func main() {
 			// detect redis
 			pc.RedisHost = os.Getenv("REDIS_SERVER")
 
+			// gorilla mux
 			r := mux.NewRouter()
+
+			// tracing
+			if jh := os.Getenv("OTEL_EXPORTER_JAEGER_AGENT_HOST"); jh != "" {
+				tp, err := initTracer()
+				if err != nil {
+					log.Fatal(err)
+				}
+				defer func() {
+					if err := tp.Shutdown(context.Background()); err != nil {
+						log.Printf("Error shutting down tracer provider: %v", err)
+					}
+				}()
+
+				otel.SetTracerProvider(tp)
+				r.Use(otelmux.Middleware("kad"))
+
+				l.Info("Tracing configured", zap.String("exporter-agent-host", jh))
+			}
 
 			adminRouter := mux.NewRouter()
 
@@ -283,6 +313,35 @@ func main() {
 	rootCmd.PersistentFlags().Float64("failure-probability", 0, "Failure probability for user requests (applies only on /, must be between 0 and 1)")
 	rootCmd.Execute()
 
+}
+
+func initTracer() (*sdktrace.TracerProvider, error) {
+	exp, err := jaeger.New(jaeger.WithAgentEndpoint())
+	if err != nil {
+		return nil, err
+	}
+
+	tp := tracesdk.NewTracerProvider(
+		// Always be sure to batch in production.
+
+		// production usage
+		//tracesdk.WithBatcher(exp),
+
+		// dev usage
+		tracesdk.WithSyncer(exp),
+		// sample every request
+		tracesdk.WithSampler(sdktrace.AlwaysSample()),
+
+		// Record information about this application in a Resource.
+		tracesdk.WithResource(resource.NewWithAttributes(
+			semconv.SchemaURL,
+			semconv.ServiceNameKey.String("kad"),
+			//attribute.String("environment", environment),
+			//attribute.Int64("ID", id),
+		)),
+	)
+
+	return tp, nil
 }
 
 func readPersistentFiles() []string {

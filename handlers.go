@@ -16,6 +16,8 @@ import (
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
+	ctx := r.Context()
+
 	err = addHit()
 	if err != nil {
 		log.Printf("Redis error: %e", err)
@@ -59,7 +61,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	readConfig()
 
 	// read resources from kubernetes
-	if err := readResources(); err != nil {
+	if err := readResources(ctx); err != nil {
 		pc.KubernetesError = err.Error()
 	}
 

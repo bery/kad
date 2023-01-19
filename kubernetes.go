@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"os"
 
@@ -46,35 +47,35 @@ func getClientset() (*kubernetes.Clientset, error) {
 }
 
 // read kubernetes resources in current namespaces and save it to rootPage
-func readResources() error {
+func readResources(ctx context.Context) error {
 	cs, err := getClientset()
 	if err != nil {
 		return err
 	}
 
 	// list pods
-	pl, err := cs.CoreV1().Pods(namespace).List(metav1.ListOptions{})
+	pl, err := cs.CoreV1().Pods(namespace).List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return err
 	}
 	pc.Resources.Pods = pl.Items
 
 	// list services
-	sl, err := cs.CoreV1().Services(namespace).List(metav1.ListOptions{})
+	sl, err := cs.CoreV1().Services(namespace).List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return err
 	}
 	pc.Resources.Services = sl.Items
 
 	// list deployments
-	dl, err := cs.AppsV1().Deployments(namespace).List(metav1.ListOptions{})
+	dl, err := cs.AppsV1().Deployments(namespace).List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return err
 	}
 	pc.Resources.Deployments = dl.Items
 
 	// list replicasets
-	rl, err := cs.AppsV1().ReplicaSets(namespace).List(metav1.ListOptions{})
+	rl, err := cs.AppsV1().ReplicaSets(namespace).List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return err
 	}
@@ -85,6 +86,8 @@ func readResources() error {
 
 func kubernetesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+
+	ctx := r.Context()
 
 	log.Printf("Kubernetes delete with %+v", vars)
 
@@ -108,31 +111,31 @@ func kubernetesDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	dp := metav1.DeletePropagationBackground
 	one := int64(1)
-	do := &metav1.DeleteOptions{
+	do := metav1.DeleteOptions{
 		GracePeriodSeconds: &one,
 		PropagationPolicy:  &dp,
 	}
 
 	switch rt {
 	case "pod":
-		if err := cs.CoreV1().Pods(namespace).Delete(name, do); err != nil {
+		if err := cs.CoreV1().Pods(namespace).Delete(ctx, name, do); err != nil {
 			http.Error(w, "Failed deleting pod "+err.Error(), http.StatusBadRequest)
 			return
 		}
 	case "deploy":
-		if err := cs.AppsV1().Deployments(namespace).Delete(name, do); err != nil {
+		if err := cs.AppsV1().Deployments(namespace).Delete(ctx, name, do); err != nil {
 			http.Error(w, "Failed deleting deployment "+err.Error(), http.StatusBadRequest)
 			return
 		}
 
 	case "rs":
-		if err := cs.AppsV1().ReplicaSets(namespace).Delete(name, do); err != nil {
+		if err := cs.AppsV1().ReplicaSets(namespace).Delete(ctx, name, do); err != nil {
 			http.Error(w, "Failed deleting replicaset "+err.Error(), http.StatusBadRequest)
 			return
 		}
 
 	case "svc":
-		if err := cs.CoreV1().Services(namespace).Delete(name, do); err != nil {
+		if err := cs.CoreV1().Services(namespace).Delete(ctx, name, do); err != nil {
 			http.Error(w, "Failed deleting service "+err.Error(), http.StatusBadRequest)
 			return
 		}

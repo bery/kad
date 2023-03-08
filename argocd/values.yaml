@@ -7,7 +7,6 @@ autosync: false
 
 kad:
   image: tomkukral/kad
-  cluster: unknown
   replicas: 2
 
   ingress:

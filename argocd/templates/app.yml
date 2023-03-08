@@ -20,7 +20,8 @@ spec:
     namespace: {{ $.Values.namespace }}
   helm:
     values: |-
-      # TODO
+      cluster: {{ $cluster }}
+      {{- toYaml $.Values.kad | nindent 6 }}
   syncPolicy:
     {{- if $.Values.autosync }}
     automated:

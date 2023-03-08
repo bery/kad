@@ -15,13 +15,13 @@ spec:
     repoURL: {{ $.Values.repoURL }}
     targetRevision: HEAD
     path: helm
+    helm:
+      values: |-
+        cluster: {{ $cluster }}
+        {{- toYaml $.Values.kad | nindent 6 }}
   destination:
     name: {{ $cluster }}
     namespace: {{ $.Values.namespace }}
-  helm:
-    values: |-
-      cluster: {{ $cluster }}
-      {{- toYaml $.Values.kad | nindent 6 }}
   syncPolicy:
     {{- if $.Values.autosync }}
     automated:

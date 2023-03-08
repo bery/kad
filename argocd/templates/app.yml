@@ -9,6 +9,8 @@ metadata:
   labels:
     cluster: {{ $cluster }}
     app: kad
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   project: {{ $.Values.project }}
   source:

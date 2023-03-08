@@ -1,6 +1,6 @@
 {{ range $h, $cluster := .Values.clusters }}
 ---
-# kad {{ $cluster }}-{{ $i }}
+# kad {{ $cluster }}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -31,3 +31,6 @@ spec:
     - Validate=true
     - CreateNamespace=true
 {{ end }}
+
+# vim: filetype=gotexttmpl
+

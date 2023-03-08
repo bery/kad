@@ -1,0 +1,33 @@
+{{ range $h, $cluster := .Values.clusters }}
+---
+# kad {{ $cluster }}-{{ $i }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kad-{{ $cluster }}
+  namespace: argo
+  labels:
+    cluster: {{ $cluster }}
+    app: kad
+spec:
+  project: {{ $.Values.project }}
+  source:
+    repoURL: {{ $.Values.repoURL }}
+    targetRevision: HEAD
+    path: helm
+  destination:
+    name: {{ $cluster }}
+    namespace: {{ $.Values.namespace }}
+  helm:
+    values: |-
+      # TODO
+  syncPolicy:
+    {{- if $.Values.autosync }}
+    automated:
+      prune: true
+      selfHeal: true
+    {{- end }}
+    syncOptions:
+    - Validate=true
+    - CreateNamespace=true
+{{ end }}

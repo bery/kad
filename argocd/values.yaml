@@ -1,0 +1,21 @@
+clusters:
+- in-cluster
+project: datascript
+repoURL: https://gitlab.com/6shore.net/kad.git
+namespace: kad
+autosync: false
+
+kad:
+  image: tomkukral/kad
+  cluster: unknown
+  replicas: 2
+
+  ingress:
+    enabled: true
+    clusterhost: kad.6shore.net
+
+  rbac:
+    enabled: false
+
+  prometheus:
+    enabled: true

@@ -5,6 +5,9 @@ replicas: 2
 ingress:
   enabled: true
   clusterhost: kad.6shore.net
+service:
+  type: ClusterIP
+  ipFamilyPolicy: PreferDualStack
 
 rbac:
   enabled: false

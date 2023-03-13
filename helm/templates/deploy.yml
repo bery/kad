@@ -6,6 +6,8 @@ metadata:
   annotations:
     prometheus.io/scrape: "{{ .Values.prometheus.enabled }}"
 spec:
+  type: {{ .Values.service.type }}
+  ipFamilyType: {{ .Values.service.ipFamilyPolicy }}
   selector:
     app: kad
   ports:
@@ -18,7 +20,8 @@ kind: Service
 metadata:
   name: redis
 spec:
-  type: ClusterIP
+  type: {{ .Values.service.type }}
+  ipFamilyType: {{ .Values.service.ipFamilyPolicy }}
   selector:
     app: redis
   ports:

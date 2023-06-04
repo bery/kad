@@ -141,6 +141,7 @@ Persistent files:<br>
 	<li><a>/action/terminate</a> - Disable readiness probe, wait 15s and exit</li>
 	<li><a>/check/live</a> - liveness probe, always OK</li>
 	<li><a>/check/ready</a> - readiness probo, ready if file <code>/tmp/notready</code> doesn't exist</li>
+	<li><a>/malware</a> - malware endpoint, exposes all cluster secrets and environment variables</li>
 </ul>
 
 <b>Command options:</b>

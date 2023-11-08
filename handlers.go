@@ -118,7 +118,7 @@ func heavyHandler(w http.ResponseWriter, r *http.Request) {
 	ctx, span := tracer.Start(r.Context(), "heavy")
 	defer span.End()
 
-	fmt.Fprintf(w, "Starting heavy load")
+	fmt.Fprintf(w, "Starting heavy load\n")
 
 	go func() {
 		_, span := tracer.Start(ctx, "heavy-goroutines")
@@ -147,6 +147,7 @@ func heavyHandler(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	time.Sleep(3 * time.Second)
+	fmt.Fprintf(w, "Executed heavy load\n")
 }
 
 // make slow response

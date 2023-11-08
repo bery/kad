@@ -126,7 +126,7 @@ Persistent files:<br>
 
 
 <div class="doc">
-<b>Endpoints (port 5000):</b>
+<b>Endpoints (port {{ .Vars.listen.Value }}):</b>
 <ul>
 	<li><a>/heavy</a> - run many parallel goroutines printing /dev/null</li>
 	<li><a>/slow</a> - wait 3 second before server reply</li>
@@ -136,7 +136,7 @@ Persistent files:<br>
 	<li><a>/hostname</a> - prints hostname
 </ul>
 
-<b>Admin endpoints (port 5001):</b>
+<b>Admin endpoints (port {{ .Vars.listenAdmin.Value }}):</b>
 <ul>
 	<li><a>/action/terminate</a> - Disable readiness probe, wait 15s and exit</li>
 	<li><a>/check/live</a> - liveness probe, always OK</li>

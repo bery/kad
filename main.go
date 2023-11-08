@@ -85,14 +85,13 @@ func (e *envVar) detect() {
 
 	e.Dangerous = strings.Contains(dv, "pass") ||
 		strings.Contains(dv, "user") ||
+		strings.Contains(dv, "token") ||
 		strings.Contains(dv, "key")
 }
 
 var (
-	listen      = ":5000"
-	listenAdmin = ":5001"
-	configFile  = "/etc/kad/config.yml"
-	pc          = pageContent{
+	configFile = "/etc/kad/config.yml"
+	pc         = pageContent{
 		Vars:           make(map[string]*envVar),
 		Hits:           0,
 		Cmd:            "",
@@ -253,6 +252,17 @@ func main() {
 				p.detect()
 				pc.Vars[pair[0]] = &p
 			}
+			listen := ":5000" //port 5000 is used by control center on macos
+			if lp := os.Getenv("LISTEN_PORT"); lp != "" {
+				listen = lp
+			}
+			listenAdmin := ":5001"
+			if lpa := os.Getenv("LISTEN_ADMIN_PORT"); lpa != "" {
+				listenAdmin = lpa
+			}
+
+			pc.Vars["listen"] = &envVar{Name: "listen", Value: listen}
+			pc.Vars["listenAdmin"] = &envVar{Name: "listenAdmin", Value: listenAdmin}
 
 			// read hostname
 			pc.Hostname, err = os.Hostname()

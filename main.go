@@ -364,6 +364,7 @@ func main() {
 		},
 	}
 	rootCmd.PersistentFlags().String("color", "", "Background color for main page")
+	rootCmd.PersistentFlags().String("user", "", "Dummy flag")
 	rootCmd.PersistentFlags().Bool("fail", false, "Fail with non-zero exit code")
 	rootCmd.PersistentFlags().String("malware-url", "", "Malware URL to send secrets")
 	rootCmd.PersistentFlags().Float64("failure-probability", 0, "Failure probability for user requests (applies only on /, must be between 0 and 1)")

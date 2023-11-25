@@ -276,7 +276,7 @@ func main() {
 
 			// setup color
 			pc.Color = cmd.Flag("color").Value.String()
-			if v := os.Getenv("COLOR"); v != "" && pc.Color == "" {
+			if v := os.Getenv("COLOR"); v != "" {
 				pc.Color = v
 			}
 			if pc.Color == "" {

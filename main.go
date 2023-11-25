@@ -49,6 +49,7 @@ type pageContent struct {
 	Color          string
 	Resources      Resources
 	Headers        []Header
+	Namespace      string
 
 	PageRefresh bool
 
@@ -280,6 +281,13 @@ func main() {
 			}
 			if pc.Color == "" {
 				pc.Color = "#ffffff"
+			}
+
+			if v := os.Getenv("NAMESPACE"); v != "" && pc.Namespace == "" {
+				pc.Namespace = v
+			}
+			if pc.Namespace == "" {
+				pc.Namespace = "kad"
 			}
 
 			// detect redis

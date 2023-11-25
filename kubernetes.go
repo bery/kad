@@ -15,7 +15,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-var namespace = "kad"
+var namespace = pc.Namespace
 
 func getClientset() (*kubernetes.Clientset, error) {
 	var (

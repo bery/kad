@@ -6,7 +6,7 @@ concurrency:
 
 on:
   pull_request:
-    types: [synchronize, reopened, labeled]
+    types: [synchronize, reopened]
   workflow_dispatch:
     inputs:
       force:
@@ -20,10 +20,6 @@ on:
         description: "Ignore changes and force deploy"
         type: string
         default: "self-hosted"
-      node-version:
-        description: "Node version to use"
-        type: string
-        default: "20.9.0"
 jobs:
   build-backend-docker-image:
     uses: ./.github/workflows/reusable-backend-build-docker-v2.yaml
@@ -31,6 +27,32 @@ jobs:
       docker-image-name: xbery-ops/kad
       force: true
       docker-context: ./
-      dockerfile: ./Dockerfile-full
-      runs-on: ${{ github.event.inputs.runs-on || 'self-hosted' }}
+      dockerfile: ./Dockerfile
+      runs-on: ${{ github.event.inputs.runs-on || 'ubuntu-latest' }}
     secrets: inherit
+  # publish:
+  #   needs: [ build-backend-docker-image ]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:   
+  #         ref: ${{ github.event.pull_request.head.sha || github.ref }}
+  #     - name: Set SHA env
+  #       run: echo "GITHUB_SHA_SHORT=$(echo ${{ github.event.pull_request.head.sha || github.sha }} | cut -c 1-8)" >> $GITHUB_ENV  
+      
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         repository: 'bery/argocd-preview-environments-deployments'
+  #         token: ${{ secrets.CI_GITHUB_TOKEN }}
+  #         ref: main
+  #     - run: ls -la
+
+  #     - run: touch values_preview_${{ inputs.pr-number || github.event.pull_request.number }}.yaml
+
+  #     - run: yq e -i '.image = "706337823207.dkr.ecr.eu-central-1.amazonaws.com/xbery-ops/kad:sha8-${{ env.GITHUB_SHA_SHORT }}"' values_preview_${{ inputs.pr-number || github.event.pull_request.number }}.yaml
+
+  #     - run: cat charts/app/values_preview_${{ inputs.pr-number || github.event.pull_request.number }}.yaml
+
+  #     - uses: EndBug/add-and-commit@v9
+  #       with:
+  #         message: 'Release sha-${{ env.GITHUB_SHA_SHORT }}'

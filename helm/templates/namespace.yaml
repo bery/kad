@@ -1,0 +1,6 @@
+{{- if .Values.pr.enabled}}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: "preview-{{.Values.pr.number}}"
+{{- end }}

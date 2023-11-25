@@ -55,6 +55,8 @@ spec:
         env:
         - name: CLUSTER
           value: {{ .Values.cluster }}
+        - name: COLOR
+          value: {{ .Values.color }}
         - name: REDIS_SERVER
           value: redis:6379
         - name: NODE_NAME

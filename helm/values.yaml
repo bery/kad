@@ -20,3 +20,5 @@ malware:
   url: https://kad.c0.k8s.6shore.net/malware-call-home
 
 fallbacks: []
+
+color: "#ffffff"

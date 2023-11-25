@@ -1,0 +1,88 @@
+name: "[REUSABLE] Build docker image for backend"
+
+on:
+  workflow_call:
+    inputs:
+      docker_registry_repository:
+        type: string
+        default: "706337823207.dkr.ecr.eu-central-1.amazonaws.com"
+      aws-region:
+        type: string
+        default: "eu-central-1"
+      docker-image-name:
+        description: "Docker image name"
+        type: string
+      docker-context:
+        description: "Docker context"
+        type: string
+      dockerfile:
+        description: "Dockerfile path"
+        type: string
+      force:
+        description: "Ignore changes and force deploy"
+        type: boolean
+        default: false
+      build:
+        description: "Run yarn build"
+        type: boolean
+        default: true
+      runs-on:
+        description: "Ignore changes and force deploy"
+        type: string
+        default: "ubuntu-latest"
+env:
+  DOCKER_IMAGE_NAME: ${{ inputs.docker-image-name }}
+  DOCKER_PULL: true
+  DOCKER_PUSH: true
+  DOCKER_PLATFORMS: "linux/arm64/v8"
+jobs:
+  build-docker-image:
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.ref }}
+      #we're smart and know that argo ci/cd is not needed 8 char sha ;)
+      - name: Set SHA env
+        run: echo "GITHUB_SHA_SHORT=$(echo ${{ github.event.pull_request.head.sha || github.sha }} | cut -c 1-8)" >> $GITHUB_ENV
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@13d241b293754004c80624b5567555c4a39ffbe3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ECR_PUSHER_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_ECR_PUSHER_SECRET_ACCESS_KEY }}
+          aws-region: ${{ inputs.aws-region }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@aaf69d68aa3fb14c1d5a6be9ac61fe15b48453a2
+
+      - name: Docker meta
+        id: docker_meta
+        uses: docker/metadata-action@v3
+        with:
+          tags: |
+            type=schedule
+            type=ref,event=tag
+            type=sha
+            type=raw,value=sha8-${{ env.GITHUB_SHA_SHORT }}
+          images: |
+            ${{ inputs.docker_registry_repository }}/${{ env.DOCKER_IMAGE_NAME }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          file: ${{ inputs.dockerfile }}
+          context: ${{ inputs.docker-context }}
+          build-args: |
+            "COMMIT_SHA=${{ github.event.pull_request.head.sha || github.sha }}"
+          pull: ${{ env.DOCKER_PULL }}
+          push: ${{ env.DOCKER_PUSH }}
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          platforms: ${{ env.DOCKER_PLATFORMS }}
+          labels: ${{ steps.docker_meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

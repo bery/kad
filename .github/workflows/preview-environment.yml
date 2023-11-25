@@ -20,10 +20,6 @@ on:
         description: "Ignore changes and force deploy"
         type: string
         default: "self-hosted"
-      node-version:
-        description: "Node version to use"
-        type: string
-        default: "20.9.0"
 jobs:
   build-backend-docker-image:
     uses: ./.github/workflows/reusable-backend-build-docker-v2.yaml

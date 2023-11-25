@@ -1,0 +1,36 @@
+name: "Deploy to preview environment"
+# Only one job in concurrency group can be run at the same time
+concurrency:
+  group: preview-environment-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    types: [synchronize, reopened, labeled]
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Ignore changes and force deploy"
+        type: string
+        default: "true"
+      pr-number:
+        description: "PR to build preview environment for"
+        type: string
+      runs-on:
+        description: "Ignore changes and force deploy"
+        type: string
+        default: "self-hosted"
+      node-version:
+        description: "Node version to use"
+        type: string
+        default: "20.9.0"
+jobs:
+  build-backend-docker-image:
+    uses: ./.github/workflows/reusable-backend-build-docker-v2.yaml
+    with:
+      docker-image-name: xbery-ops/kad
+      force: true
+      docker-context: ./
+      dockerfile: ./Dockerfile-full
+      runs-on: ${{ github.event.inputs.runs-on || 'self-hosted' }}
+    secrets: inherit

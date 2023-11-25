@@ -6,7 +6,7 @@ concurrency:
 
 on:
   pull_request:
-    types: [synchronize, reopened, labeled]
+    types: [synchronize, reopened]
   workflow_dispatch:
     inputs:
       force:

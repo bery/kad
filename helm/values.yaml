@@ -3,7 +3,7 @@ cluster: unknown
 replicas: 2
 
 ingress:
-  enabled: true
+  enabled: false
   clusterhost: kad.6shore.net
 service:
   type: ClusterIP

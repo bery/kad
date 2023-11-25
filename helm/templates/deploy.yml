@@ -56,7 +56,7 @@ spec:
         - name: CLUSTER
           value: {{ .Values.cluster }}
         - name: COLOR
-          value: {{ .Values.color }}
+          value: {{ .Values.color | quote }} #as the values contains a hash :D
         - name: REDIS_SERVER
           value: redis:6379
         - name: NODE_NAME

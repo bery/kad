@@ -28,5 +28,5 @@ jobs:
       force: true
       docker-context: ./
       dockerfile: ./Dockerfile-full
-      runs-on: ${{ github.event.inputs.runs-on || 'self-hosted' }}
+      runs-on: ${{ github.event.inputs.runs-on || 'ubuntu-latest' }}
     secrets: inherit

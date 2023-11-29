@@ -29,7 +29,7 @@ spec:
             {{- else }}
             backend:
               service:
-                name: {{ default $fullName }}
+                name: kad
                 port:
                   number: {{ $svcPort }}
             {{- end }}

@@ -1,13 +1,13 @@
-name: "Deploy to main"
+name: "Deploy to master"
 # Only one job in concurrency group can be run at the same time
 concurrency:
-  group: main-${{ github.ref }}
+  group: master-${{ github.ref }}
   # cancel-in-progress: true
 
 on:
   push:
     branches:
-      - main
+      - master
   workflow_dispatch:
     inputs:
       force:

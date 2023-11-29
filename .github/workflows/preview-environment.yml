@@ -48,11 +48,11 @@ jobs:
 
       - run: ls -la
 
-      - run: touch charts/values/values_preview_${{ inputs.pr-number || github.event.pull_request.number }}.yaml
+      - run: touch values_preview_${{ inputs.pr-number || github.event.pull_request.number }}.yaml
 
-      - run: yq e -i '.image = "706337823207.dkr.ecr.eu-central-1.amazonaws.com/xbery-ops/kad:sha8-${{ env.GITHUB_SHA_SHORT }}"' charts/values/values_preview_${{ inputs.pr-number || github.event.pull_request.number }}.yaml
+      - run: yq e -i '.image = "706337823207.dkr.ecr.eu-central-1.amazonaws.com/xbery-ops/kad:sha8-${{ env.GITHUB_SHA_SHORT }}"' values_preview_${{ inputs.pr-number || github.event.pull_request.number }}.yaml
 
-      - run: cat charts/values/values_preview_${{ inputs.pr-number || github.event.pull_request.number }}.yaml
+      - run: cat values_preview_${{ inputs.pr-number || github.event.pull_request.number }}.yaml
 
       - uses: EndBug/add-and-commit@v9
         with:

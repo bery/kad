@@ -11,7 +11,7 @@ ingress:
     alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:eu-central-1:706337823207:certificate/c1310274-2138-403e-836e-8c69537f6d44"
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
     alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
-    alb.ingress.kubernetes.io/healthcheck-path: /plugin/hosts/745
+    alb.ingress.kubernetes.io/healthcheck-path: /check/live
     alb.ingress.kubernetes.io/group.name: api
     # alb.ingress.kubernetes.io/subnets: subnet-0ec7f46e618e51a05, subnet-0bb368911dcba7c08, subnet-068df146bd3ba2ed3
     alb.ingress.kubernetes.io/target-group-attributes: deregistration_delay.timeout_seconds=30

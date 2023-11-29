@@ -5,6 +5,9 @@ replicas: 3
 redis:
   enabled: true
 
+pr:
+  enabled: false
+
 ingress:
   enabled: false
   className: "alb"

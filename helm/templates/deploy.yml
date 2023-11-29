@@ -45,11 +45,7 @@ spec:
       containers:
       - name: app
         image: {{ required ".Values.image is required!" .Values.image }}
-        #{{ if .Values.malware.enabled }}
-        #command:
-        #- /bin/kad
-        #- --malware-url "{{ .Values.malware.url }}"
-        #{{ end }}
+        command: ["/bin/kad", "--color", "$(COLOR)"]
         ports:
         - containerPort: 5000
         env:

@@ -44,7 +44,7 @@ spec:
     spec:
       containers:
       - name: app
-        image: {{ .Values.image }}
+        image: {{ required ".Values.image is required!" .Values.image }}
         #{{ if .Values.malware.enabled }}
         #command:
         #- /bin/kad

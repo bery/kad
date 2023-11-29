@@ -1,60 +1,42 @@
-# {{ if and (.Values.ingress.enabled) (not (hasPrefix "vk8s" .Values.cluster)) }}
-# ---
-# apiVersion: traefik.containo.us/v1alpha1
-# kind: Middleware
-# metadata:
-#   name: ratelimit
-# spec:
-#   rateLimit:
-#     average: 3
-#     burst: 3
-# ---
-# apiVersion: traefik.containo.us/v1alpha1
-# kind: Middleware
-# metadata:
-#   name: retry
-# spec:
-#   retry:
-#     attempts: 3
-# ---
-# apiVersion: traefik.containo.us/v1alpha1
-# kind: Middleware
-# metadata:
-#   name: ipwhitelist
-# spec:
-#   ipWhiteList:
-#     sourceRange:
-#    # - 193.71.191.150/32
-#     - 46.19.17.126/32
-#     - ::1/128
-#     ipStrategy:
-#       excludedIPs:
-#       - 192.168.0.0/16
-# ---
-# apiVersion: traefik.containo.us/v1alpha1
-# kind: IngressRoute
-# metadata:
-#   name: kad
-# spec:
-#   entryPoints:
-#     - http
-#     - https
-#   #tls: {}
-#   routes:
-#   - match: HostRegexp(`kad.{domain:.+}`){{ if .Values.ingress.clusterhost }} || HostRegexp(`{{ .Values.ingress.clusterhost }}`){{ end }}
-#     kind: Rule
-#     middlewares:
-#     #- name: ratelimit
-#     - name: retry
-#     #- name: ipwhitelist
-#     services:
-#     - name: kad
-#       port: 80
-#       weight: 1000
-#     {{- range $h, $fb := .Values.fallbacks }} 
-#     # fallback {{ $fb }}
-#     - name: kad-fallback-{{ $h }}
-#       port: 80
-#       weight: 1
-#     {{- end }}
-# {{ end }}
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- if .Values.ingress.tls }}
+  tls:
+    {{- range .Values.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    {{- range .Values.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            {{- if .backend }}
+            backend:
+{{ toYaml .backend | indent 14 }}
+            {{- else }}
+            backend:
+              service:
+                name: kad
+                port:
+                  number: 80
+            {{- end }}
+          {{- end }}
+    {{- end }}
+{{- end }}

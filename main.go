@@ -283,6 +283,8 @@ func main() {
 				pc.Color = "#ffffff"
 			}
 
+			log.Printf("Using color: %s", pc.Color)
+
 			if v := os.Getenv("NAMESPACE"); v != "" && pc.Namespace == "" {
 				pc.Namespace = v
 			}

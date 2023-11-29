@@ -1,4 +1,4 @@
-image: tomkukral/kad
+# image: tomkukral/kad
 cluster: unknown
 replicas: 3
 

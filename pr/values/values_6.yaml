@@ -1,0 +1,4 @@
+replicas: 3
+redis:
+  enabled: false
+color: "#ccc"

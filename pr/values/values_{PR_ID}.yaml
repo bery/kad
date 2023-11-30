@@ -1,4 +1,4 @@
 replicas: 2
 redis:
   enabled: false
-color: "#ccc"
+color: "#fff"
